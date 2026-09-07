@@ -1,0 +1,1013 @@
+<meta charset="utf-8">
+<title>演安智策演示系统</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Noto+Sans+SC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  /* 配色与命名直接取自 frontend/src/style.css（真实 Vue 项目），
+     保证本页与已有 admin/frontend 是"同一产品语言"，而不是另一套视觉体系。 */
+  :root {
+    --bg: #f3f5f9; --surface: #ffffff; --surface-alt: #f7f9fc; --surface-alt2: #eef1f7;
+    --line: #e3e8f0; --line-strong: #cdd5e0;
+    --ink: #1e293b; --muted: #64748b; --dim: #94a3b8;
+    --amber: #d97706; --amber-soft: #fef3e2;
+    --teal: #0d9488; --teal-soft: #e6f7f5;
+    --red: #dc2626; --red-soft: #fdecec;
+    --blue: #2563eb; --blue-soft: #eaf1fd;
+    --shadow: 0 1px 2px rgba(30,41,59,.05), 0 8px 20px -14px rgba(30,41,59,.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f141c; --surface: #161d29; --surface-alt: #1b2330; --surface-alt2: #212b3a;
+      --line: rgba(255,255,255,.09); --line-strong: rgba(255,255,255,.18);
+      --ink: #e6eaf0; --muted: #93a0b3; --dim: #66748a;
+      --amber: #e8a13c; --amber-soft: rgba(232,161,60,.14);
+      --teal: #3ddbc4; --teal-soft: rgba(61,219,196,.12);
+      --red: #f2685f; --red-soft: rgba(242,104,95,.13);
+      --blue: #5b93f0; --blue-soft: rgba(91,147,240,.14);
+      --shadow: 0 1px 2px rgba(0,0,0,.35), 0 8px 20px -14px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f141c; --surface: #161d29; --surface-alt: #1b2330; --surface-alt2: #212b3a;
+    --line: rgba(255,255,255,.09); --line-strong: rgba(255,255,255,.18);
+    --ink: #e6eaf0; --muted: #93a0b3; --dim: #66748a;
+    --amber: #e8a13c; --amber-soft: rgba(232,161,60,.14);
+    --teal: #3ddbc4; --teal-soft: rgba(61,219,196,.12);
+    --red: #f2685f; --red-soft: rgba(242,104,95,.13);
+    --blue: #5b93f0; --blue-soft: rgba(91,147,240,.14);
+    --shadow: 0 1px 2px rgba(0,0,0,.35), 0 8px 20px -14px rgba(0,0,0,.6);
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 13.5px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+    max-width: 100%; overflow-x: hidden;
+  }
+  h1,h2,h3 { font-family: "Noto Serif SC", "Songti SC", serif; font-weight: 800; text-wrap: balance; }
+  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  button { font-family: inherit; cursor: pointer; }
+  a { color: var(--blue); }
+  button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px; }
+  [hidden] { display: none !important; }
+
+  .app { display: flex; min-height: 100vh; }
+
+  .sidebar {
+    width: 226px; flex: none; background: var(--surface); border-right: 1px solid var(--line);
+    padding: 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; display: flex; flex-direction: column;
+  }
+  .brand { padding: 18px 18px 15px; border-bottom: 1px solid var(--line); }
+  .brand .t1 { font-size: 11px; color: var(--muted); letter-spacing: .08em; font-family: "JetBrains Mono", monospace; }
+  .brand .t2 { font-size: 14.5px; font-weight: 700; margin-top: 4px; font-family: "Noto Serif SC", serif; }
+  .brand .t2 b { color: var(--amber); }
+  .nav-scroll { flex: 1; overflow-y: auto; padding: 8px 0; }
+  .grp { padding: 12px 18px 5px; font-size: 10.5px; color: var(--dim); letter-spacing: .12em; }
+  nav.modules a, nav.modules button {
+    display: flex; align-items: center; gap: 9px; width: 100%; text-align: left;
+    padding: 8px 18px; color: var(--muted); text-decoration: none; font-size: 12.8px;
+    border-left: 2px solid transparent; background: none; border-top: none; border-right: none; border-bottom: none;
+  }
+  nav.modules button:hover, nav.modules a:hover { color: var(--ink); background: var(--surface-alt); }
+  nav.modules button.active { color: var(--amber); border-left-color: var(--amber); background: var(--surface-alt); font-weight: 600; }
+  .tag-proposed { font-family: "JetBrains Mono", monospace; font-size: 9px; color: var(--blue); border: 1px solid var(--blue); border-radius: 3px; padding: 0 4px; margin-left: auto; flex: none; }
+  .sidebar-foot { padding: 12px 18px 16px; border-top: 1px solid var(--line); font-size: 10.5px; color: var(--dim); line-height: 1.7; }
+  .sidebar-foot a { color: var(--muted); }
+
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+  .topbar {
+    height: 50px; flex: none; display: flex; align-items: center; gap: 12px; padding: 0 24px;
+    border-bottom: 1px solid var(--line); background: var(--surface);
+  }
+  .topbar .crumb { font-size: 12.5px; color: var(--muted); }
+  .topbar .crumb b { color: var(--ink); font-weight: 700; }
+  .source-badge {
+    margin-left: auto; font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: .03em;
+    padding: 3px 9px; border-radius: 999px; flex: none; white-space: nowrap;
+  }
+  .source-badge.real { color: var(--teal); border: 1px solid var(--teal); background: var(--teal-soft); }
+  .source-badge.proposed { color: var(--blue); border: 1px solid var(--blue); background: var(--blue-soft); }
+  .content { flex: 1; overflow-y: auto; padding: 22px 26px 60px; max-width: 1180px; }
+
+  .page-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .page-header h2 { font-size: 17px; margin: 0; }
+  .page-header .sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 7px;
+    padding: 16px 18px; margin-bottom: 14px; box-shadow: var(--shadow);
+  }
+  .card-title {
+    font-size: 12px; color: var(--muted); letter-spacing: .05em; margin-bottom: 11px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+  }
+  .card-title .btns { display: flex; gap: 6px; flex-wrap: wrap; }
+  .card h4 { font-size: 12.8px; color: var(--ink); margin: 14px 0 6px; }
+  .card h4:first-child { margin-top: 0; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px; border-radius: 5px; padding: 7px 13px;
+    font-size: 12.5px; font-weight: 600; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink);
+  }
+  .btn:hover { background: var(--surface-alt); }
+  .btn.primary { background: var(--amber); border-color: var(--amber); color: #fff; }
+  .btn.primary:hover { filter: brightness(1.06); }
+  .btn.text { border-color: transparent; background: none; padding: 6px 8px; color: var(--muted); }
+  .btn.text:hover { color: var(--ink); }
+  .btn.danger.plain { color: var(--red); border-color: var(--red); background: none; }
+  .btn:disabled { opacity: .42; cursor: not-allowed; }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  input[type=text], input[type=number], textarea, select {
+    font-family: inherit; font-size: 13px; padding: 7px 10px; border: 1px solid var(--line-strong);
+    border-radius: 5px; background: var(--surface); color: var(--ink); width: 100%;
+  }
+  textarea { resize: vertical; min-height: 76px; line-height: 1.6; }
+  label.field { display: block; font-size: 11.5px; color: var(--muted); margin: 0 0 5px; }
+  .field-row { margin-bottom: 12px; }
+  .radio-row { display: flex; gap: 6px; margin-bottom: 14px; }
+  .radio-row button { padding: 6px 14px; border-radius: 5px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--muted); font-size: 12.5px; }
+  .radio-row button.active { background: var(--amber-soft); border-color: var(--amber); color: var(--amber); font-weight: 600; }
+
+  /* status-chip：与 StatusChip.vue 完全一致的语义色 */
+  .status-chip {
+    display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-family: "JetBrains Mono", monospace;
+    padding: 2px 9px; border-radius: 3px; border: 1px solid var(--line); color: var(--muted); background: var(--surface-alt);
+    letter-spacing: .03em; white-space: nowrap;
+  }
+  .status-chip.amber { color: var(--amber); border-color: var(--amber); background: var(--amber-soft); }
+  .status-chip.teal { color: var(--teal); border-color: var(--teal); background: var(--teal-soft); }
+  .status-chip.red { color: var(--red); border-color: var(--red); background: var(--red-soft); }
+  .status-chip.blue { color: var(--blue); border-color: var(--blue); background: var(--blue-soft); }
+  .status-chip.dim { color: var(--dim); }
+
+  .kv-row { display: flex; gap: 10px; padding: 4px 0; font-size: 12.8px; }
+  .kv-row .k { width: 84px; flex: none; color: var(--dim); }
+  .empty-hint { color: var(--dim); font-size: 12px; text-align: center; padding: 26px 0; }
+
+  .cite-tag {
+    font-family: "JetBrains Mono", monospace; font-size: 10.5px; color: var(--amber);
+    border: 1px dashed color-mix(in srgb, var(--amber) 55%, transparent); border-radius: 3px; padding: 1px 6px; cursor: help;
+  }
+
+  table.tbl { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  table.tbl th, table.tbl td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  table.tbl th { color: var(--dim); font-weight: 600; font-size: 10.8px; letter-spacing: .04em; }
+  table.tbl tr:last-child td { border-bottom: none; }
+  table.tbl a { text-decoration: none; font-weight: 600; }
+  .tbl-scroll { overflow-x: auto; }
+
+  .tag-chip { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--surface-alt2); color: var(--muted); border: 1px solid var(--line); }
+
+  /* Stepper：字段与配色对齐 EventStepper.vue */
+  .stepper { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+  .stepper button {
+    font-size: 12px; color: var(--muted); background: var(--surface); border: 1px solid var(--line);
+    border-radius: 4px; padding: 7px 13px;
+  }
+  .stepper button:hover { color: var(--ink); border-color: var(--dim); }
+  .stepper button.active { color: var(--amber); border-color: var(--amber); background: var(--amber-soft); font-weight: 600; }
+
+  .alert { border-radius: 6px; padding: 12px 15px; font-size: 12.5px; display: flex; gap: 10px; margin-bottom: 14px; }
+  .alert.warn { background: var(--amber-soft); color: var(--ink); border: 1px solid color-mix(in srgb, var(--amber) 40%, transparent); }
+  .alert.info { background: var(--blue-soft); color: var(--ink); border: 1px solid color-mix(in srgb, var(--blue) 35%, transparent); }
+  .alert .ico { flex: none; font-family: "JetBrains Mono", monospace; font-weight: 700; }
+  .alert b { display: block; margin-bottom: 2px; }
+
+  .obj-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 9px; }
+  .obj-card { border: 1px solid var(--line); border-radius: 7px; padding: 9px 11px; background: var(--surface); cursor: pointer; }
+  .obj-card:hover { border-color: var(--amber); }
+  .obj-card .obj-id { font-family: "JetBrains Mono", monospace; font-size: 10.5px; font-weight: 700; }
+  .obj-card .obj-name { font-size: 11px; color: var(--muted); margin: 2px 0 7px; }
+
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-row .sub { font-size: 11px; color: var(--dim); }
+  .switch { position: relative; width: 36px; height: 20px; flex: none; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch .track { position: absolute; inset: 0; background: var(--line-strong); border-radius: 999px; transition: background .15s; }
+  .switch .track::before { content: ""; position: absolute; width: 14px; height: 14px; left: 3px; top: 3px; background: var(--surface); border-radius: 50%; transition: transform .15s; }
+  .switch input:checked + .track { background: var(--amber); }
+  .switch input:checked + .track::before { transform: translateX(16px); }
+  @media (prefers-reduced-motion: reduce) { .switch .track, .switch .track::before, .progress-bar i { transition: none; } }
+
+  .progress-bar { height: 6px; border-radius: 999px; background: var(--surface-alt2); overflow: hidden; }
+  .progress-bar i { display: block; height: 100%; background: var(--teal); transition: width .3s; }
+
+  .diagram-scroll { overflow-x: auto; }
+  figure.diagram { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 8px 6px; color: var(--ink); }
+  figure.diagram svg { display: block; width: 100%; height: auto; }
+  figure.diagram figcaption { font-size: 11.5px; color: var(--muted); text-align: center; padding: 10px 12px 2px; }
+
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 10px; }
+  .metric { border: 1px solid var(--line); border-radius: 7px; padding: 11px 13px; background: var(--surface); }
+  .metric .val { font-family: "JetBrains Mono", monospace; font-size: 20px; font-weight: 700; }
+  .metric .lbl { font-size: 10.8px; color: var(--dim); margin-top: 2px; }
+
+  .toast {
+    position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(16px);
+    background: var(--ink); color: var(--bg); padding: 10px 18px; border-radius: 999px;
+    font-size: 12.5px; font-weight: 600; box-shadow: var(--shadow); opacity: 0; pointer-events: none;
+    transition: opacity .2s, transform .2s; z-index: 100;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+</style>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="t1">复兴岛 · 量子城市</div>
+      <div class="t2">应急预案<b>智能生成</b>平台</div>
+    </div>
+    <div class="nav-scroll">
+      <div class="grp">总览</div>
+      <nav class="modules">
+        <button data-tab="dashboard-link" class="nav-btn"><span>态势大屏</span></button>
+        <button data-tab="activity" class="nav-btn active"><span>活动与场景</span></button>
+      </nav>
+      <div class="grp">事件处置（当前事件）</div>
+      <nav class="modules">
+        <button data-tab="event" class="nav-btn"><span>六步流程 · 事件确认→复盘</span></button>
+      </nav>
+      <div class="grp">知识管理</div>
+      <nav class="modules">
+        <button data-tab="knowledge" class="nav-btn"><span>知识库后台</span></button>
+      </nav>
+      <div class="grp">需求重构文档 · 拟建设</div>
+      <nav class="modules">
+        <button data-tab="ontology" class="nav-btn"><span>本体对象视图</span><span class="tag-proposed">NEW</span></button>
+        <button data-tab="teaching" class="nav-btn"><span>教学实验台</span><span class="tag-proposed">NEW</span></button>
+      </nav>
+    </div>
+    <div class="sidebar-foot">
+      已核对 <span class="mono">frontend/</span><span class="mono">backend/</span> 真实代码；配色、状态词与数据结构均取自现有实现，标 <span class="tag-proposed" style="margin:0 2px;">NEW</span> 的两块来自需求重构文档，尚未进入真实路由。
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <span class="crumb" id="crumb"><b>活动与场景</b> · 对应 ActivityListView / ActivityDetailView</span>
+      <span class="source-badge real" id="sourceBadge">已有实现 · REAL</span>
+    </div>
+
+    <div class="content">
+
+      <!-- ============ 态势大屏 外链提示 ============ -->
+      <section id="tab-dashboard-link" hidden>
+        <div class="card">
+          <div class="card-title">态势大屏已经是可运行的真实演示</div>
+          <p style="font-size:13px;margin:0 0 12px;">
+            这一屏（人群疏散仿真 + 四智能体会商日志：态势感知 / 风险研判 / 疏导策略 / 总指挥，含真实规范条文引用与偏差自动重新会商）已经从
+            <span class="cite-tag" title="独立的静态演示文件，早于当前 Vue 项目">复兴岛应急决策MVP演示.html</span>
+            移植进 <span class="mono">DashboardView.vue</span>，不需要在这份原型里重做一遍。
+          </p>
+          <div class="btn-row">
+            <button class="btn primary" onclick="window.open('复兴岛应急决策MVP演示.html','_blank')">在新标签页打开态势大屏</button>
+          </div>
+          <div class="alert info" style="margin-top:14px;">
+            <span class="ico">i</span>
+            <div><b>与本页的关系</b>态势大屏是"开场演示"，本页其余标签对应的是活动创建之后、真正逐步走完预案生成到复盘的可操作应用——两者配合使用，不是二选一。</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 活动与场景（对应 ActivityListView + ActivityDetailView） ============ -->
+      <section id="tab-activity">
+        <div class="page-header">
+          <div><h2>活动与场景</h2><div class="sub">创建重大演绎活动，配置场景（关键通道/出入口/设施/岗位/资源），作为事件处置的载体</div></div>
+          <button class="btn primary">+ 新建活动</button>
+        </div>
+
+        <div class="card">
+          <div class="card-title">活动列表</div>
+          <div class="tbl-scroll"><table class="tbl">
+            <tr><th>活动名称</th><th>类型</th><th>地点</th><th>时间</th><th>状态</th></tr>
+            <tr>
+              <td><a href="#" id="activityLink">复兴岛船台公园音乐节</a></td>
+              <td>演出</td><td>复兴岛船台公园</td><td>2026-09-20 18:00 ~ 22:30</td>
+              <td><span class="status-chip teal">进行中</span></td>
+            </tr>
+          </table></div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title"><span>场景配置</span></div>
+            <div class="kv-row"><span class="k">场景名称</span>复兴岛船台公园场景</div>
+            <div class="kv-row"><span class="k">关键通道</span>东侧主要通道、北侧备用通道、西侧便桥</div>
+            <div class="kv-row"><span class="k">出入口</span>A口·定海路桥、B口·东主通道、C口·南侧通道、D口·西侧便桥</div>
+            <div class="kv-row"><span class="k">关键设施</span>主舞台、临时看台、消防通道</div>
+            <div class="kv-row"><span class="k">基本资源</span>隔离带20条、应急照明10套、扩音器6个</div>
+          </div>
+          <div class="card">
+            <div class="card-title">可用岗位（管理员预置）</div>
+            <div style="display:flex;flex-wrap:wrap;gap:7px;">
+              <span class="tag-chip">总指挥</span><span class="tag-chip">保安</span><span class="tag-chip">引导员</span>
+              <span class="tag-chip">设备保障</span><span class="tag-chip">医疗</span><span class="tag-chip">信息报告员</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><span>突发事件</span><button class="btn primary" id="btnCreateEvent">+ 录入突发事件</button></div>
+          <div class="tbl-scroll"><table class="tbl">
+            <tr><th>事件名称</th><th>类型</th><th>地点</th><th>风险等级</th><th>状态</th></tr>
+            <tr>
+              <td><a href="#" id="eventLink">东侧通道设施故障</a></td>
+              <td>facility_failure</td><td>东侧主要通道</td><td class="mono">L2</td>
+              <td><span class="status-chip amber" id="activityEventStatus">预案待审核</span></td>
+            </tr>
+          </table></div>
+        </div>
+      </section>
+
+      <!-- ============ 事件六步流程 ============ -->
+      <section id="tab-event" hidden>
+        <div class="stepper" id="eventStepper">
+          <button data-step="s1" class="active">① 事件确认</button>
+          <button data-step="s2">② 知识检索</button>
+          <button data-step="s3">③ 预案生成</button>
+          <button data-step="s4">④ 任务分解</button>
+          <button data-step="s5">⑤ 执行跟踪</button>
+          <button data-step="s6">⑥ 复盘报告</button>
+        </div>
+
+        <!-- ① 事件确认 -->
+        <div id="step-s1">
+          <div class="page-header"><div><h2>录入突发事件</h2><div class="sub">支持自然语言描述或结构化表单两种录入方式</div></div><span class="status-chip amber" id="eventStatusChip">待确认</span></div>
+
+          <div class="radio-row">
+            <button class="active" data-mode="nl">自然语言录入</button>
+            <button data-mode="form">表单录入</button>
+          </div>
+
+          <div class="card">
+            <div class="card-title">事件描述</div>
+            <textarea id="rawText" rows="4">演出开始30分钟后，东侧主要通道因临时设施故障无法通行，预计20分钟内无法恢复。目前东侧附近观众较多，现场已有4名保安、3名引导员和2名设备保障人员。</textarea>
+            <p style="font-size:11.5px;color:var(--muted);margin:8px 0 0;">提交后由「事件分析 Agent」自动提取结构化字段，可在下一步重新分析或人工修改。</p>
+          </div>
+
+          <div class="btn-row" style="margin-bottom:14px;">
+            <button class="btn primary" id="btnAnalyzeEvent">运行事件分析 Agent</button>
+          </div>
+
+          <div class="grid-2" id="eventAnalyzed" hidden>
+            <div class="card">
+              <div class="card-title">原始信息</div>
+              <div class="kv-row"><span class="k">事件描述</span>临时设施故障导致通道无法通行</div>
+              <button class="btn text" id="btnReanalyze">↻ 重新分析</button>
+            </div>
+            <div class="card">
+              <div class="card-title">AI 提取结果（可人工修改）</div>
+              <div class="field-row"><label class="field">事件类型</label><input type="text" value="facility_failure"></div>
+              <div class="field-row"><label class="field">风险等级</label>
+                <select><option>L1</option><option selected>L2</option><option>L3</option><option>L4</option></select>
+              </div>
+              <div class="field-row"><label class="field">影响范围</label><input type="text" value="东侧主要通道, 东侧区域"></div>
+              <div class="field-row"><label class="field">参与岗位</label><input type="text" value="保安, 引导员, 设备保障"></div>
+              <div class="field-row"><label class="field">处置目标</label><input type="text" value="控制故障区域, 引导观众分流"></div>
+              <div class="field-row"><label class="field">信息缺口</label><input type="text" value="东侧区域人数, 故障修复时长"></div>
+            </div>
+          </div>
+
+          <div class="btn-row" id="eventConfirmRow" hidden>
+            <button class="btn">保存修改</button>
+            <button class="btn primary" id="btnConfirmEvent">确认事件</button>
+            <span style="font-size:12px;color:var(--muted);align-self:center;" id="eventConfirmHint"></span>
+          </div>
+        </div>
+
+        <!-- ② 知识检索 -->
+        <div id="step-s2" hidden>
+          <div class="page-header"><div><h2>知识检索</h2><div class="sub">根据事件类型/地点/风险等级/参与岗位构造查询，检索相关预案、案例、岗位职责与场景知识</div></div>
+            <button class="btn primary" id="btnRetrieve">检索相关知识</button></div>
+
+          <div class="alert warn" id="ragAlert" hidden>
+            <span class="ico">!</span>
+            <div><b>检索结果为空</b>向量检索服务（RAG）尚未接入 embedding，知识库文档已解析入库但暂时无法被语义检索命中——这是当前后端 <span class="mono">rag_service.py</span> 的真实状态，不是本原型的演示限制。可直接跳过本步，预案生成 Agent 仍会正常运行，只是不会附带知识引用。</div>
+          </div>
+
+          <div class="btn-row"><button class="btn primary" id="btnToPlan">直接进入预案生成 →</button></div>
+        </div>
+
+        <!-- ③ 预案生成 -->
+        <div id="step-s3" hidden>
+          <div class="page-header">
+            <div><h2>预案生成</h2><div class="sub">九部分结构化应急预案：事件概况/处置目标/响应原则/组织与职责/处置流程/岗位处置要求/信息报告机制/升级恢复终止条件/知识引用</div></div>
+            <span class="status-chip amber" id="planStatusChip" hidden>预案待审核</span>
+          </div>
+
+          <div class="card" id="planEmptyCard">
+            <div class="card-title">尚未生成预案</div>
+            <div class="btn-row">
+              <button class="btn primary" id="btnGenPlan">AI 生成预案</button>
+              <button class="btn" id="btnLoadSamplePlan">载入示例预案（演示兜底）</button>
+            </div>
+          </div>
+
+          <div id="planContent" hidden>
+            <div class="card">
+              <div class="card-title">
+                <span>东侧通道设施故障应急处置预案</span>
+                <div class="btns">
+                  <button class="btn text">高级编辑</button>
+                  <button class="btn primary" id="btnConfirmPlan">确认预案</button>
+                  <button class="btn" id="btnExportPlan">导出 Word</button>
+                </div>
+              </div>
+              <div class="grid-2">
+                <div>
+                  <h4>① 事件概况</h4>
+                  <p style="font-size:12.8px;color:var(--muted);">临时设施故障导致通道无法通行</p>
+                  <div class="kv-row"><span class="k">时间</span>演出开始后30分钟</div>
+                  <div class="kv-row"><span class="k">地点</span>东侧主要通道</div>
+                  <div class="kv-row"><span class="k">影响</span>可能造成东侧区域人员聚集</div>
+
+                  <h4>② 处置目标</h4>
+                  <ol style="margin:0 0 4px;padding-left:18px;">
+                    <li>立即控制故障区域并阻止人员进入</li>
+                    <li>引导观众使用备用通道</li>
+                  </ol>
+
+                  <h4>③ 响应原则</h4>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                    <span class="tag-chip">统一指挥</span><span class="tag-chip">安全优先</span><span class="tag-chip">岗位协同</span><span class="tag-chip">及时反馈</span>
+                  </div>
+
+                  <h4>④ 组织与职责</h4>
+                  <p style="margin:0 0 4px;"><b>总指挥</b></p>
+                  <ul style="margin:0 0 8px;padding-left:18px;"><li>确认预案启动</li><li>协调各岗位行动</li><li>决定是否升级响应</li></ul>
+                  <p style="margin:0 0 4px;"><b>保安</b></p>
+                  <ul style="margin:0;padding-left:18px;"><li>设置隔离带</li><li>维持现场秩序</li></ul>
+                </div>
+                <div>
+                  <h4>⑤ 处置流程</h4>
+                  <p style="margin:0 0 4px;"><b>P1 · 立即响应</b>（控制现场并启动信息报告）</p>
+                  <ul style="margin:0 0 8px;padding-left:18px;"><li>设置临时隔离</li><li>发布通道关闭提示</li></ul>
+                  <p style="margin:0 0 4px;"><b>P2 · 现场控制</b>（分流观众、稳定现场秩序）</p>
+                  <ul style="margin:0;padding-left:18px;"><li>引导至备用通道</li><li>增派人员值守</li></ul>
+
+                  <h4>⑥ 岗位处置要求</h4>
+                  <p style="margin:0 0 4px;"><b>引导员</b></p>
+                  <ul style="margin:0;padding-left:18px;"><li>引导观众前往备用通道</li><li>解答现场观众询问</li></ul>
+
+                  <h4>⑦ 信息报告机制</h4>
+                  <div class="kv-row"><span class="k">报告人</span>现场总指挥</div>
+                  <div class="kv-row"><span class="k">频率</span>关键状态变化时立即报告</div>
+
+                  <h4>⑧ 升级/恢复/终止条件</h4>
+                  <p style="font-size:12.3px;color:var(--muted);margin:0 0 2px;">升级：备用通道无法使用；现场出现明显聚集</p>
+                  <p style="font-size:12.3px;color:var(--muted);margin:0;">恢复：故障排除；通道安全检查完成；总指挥确认恢复开放</p>
+
+                  <h4>⑨ 知识引用</h4>
+                  <span class="cite-tag" title="《重大演绎活动现场应急预案》· 设施故障处置章节">重大演绎活动现场应急预案</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">局部重新生成</div>
+              <div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap;">
+                <select style="width:200px;">
+                  <option>event_summary</option><option selected>objectives</option><option>principles</option>
+                  <option>roles</option><option>phases</option><option>role_requirements</option>
+                  <option>reporting</option><option>escalation_conditions</option><option>recovery_conditions</option>
+                </select>
+                <input type="text" placeholder="补充要求（可选）" style="flex:1;min-width:160px;">
+                <button class="btn" id="btnRegenSection">重新生成该部分</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">版本记录（1）</div>
+              <table class="tbl"><tr><th>版本</th><th>来源</th><th>说明</th></tr>
+                <tr><td class="mono">V1</td><td>ai_generated</td><td>初次生成</td></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ④ 任务分解 -->
+        <div id="step-s4" hidden>
+          <div class="page-header"><div><h2>岗位任务清单</h2><div class="sub">将预案分解为责任主体、动作、地点、时限、完成标准均明确的可执行任务</div></div></div>
+
+          <div class="card" id="taskEmptyCard">
+            <div class="card-title">尚未生成岗位任务</div>
+            <div class="btn-row">
+              <button class="btn primary" id="btnGenTasks">AI 生成任务清单</button>
+              <button class="btn" id="btnLoadSampleTasks">载入示例任务（演示兜底）</button>
+            </div>
+          </div>
+
+          <div id="taskContent" hidden>
+            <div class="page-header">
+              <div class="radio-row" style="margin:0;">
+                <button class="active" data-group="role">按岗位</button>
+                <button data-group="phase">按阶段</button>
+                <button data-group="time">按计划时间</button>
+              </div>
+              <div class="btn-row">
+                <button class="btn">+ 新增任务</button>
+                <button class="btn primary" id="btnConfirmTasks">确认任务清单</button>
+              </div>
+            </div>
+
+            <div class="alert warn" id="taskValidationAlert" hidden>
+              <span class="ico">!</span>
+              <div><b>校验未通过</b>引导员 G2 在 TASK-002 与候选任务"北侧核查"之间时间窗重叠，请调整责任分工后重新确认。</div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">保安（1）</div>
+              <table class="tbl">
+                <tr><th>编号</th><th>任务</th><th>阶段</th><th>地点</th><th>时限(分)</th><th>完成标准</th><th>状态</th></tr>
+                <tr>
+                  <td class="mono">TASK-001</td><td>设置东侧通道临时隔离</td><td class="mono">P1</td><td>东侧主要通道入口</td><td class="mono">3</td>
+                  <td>故障通道入口完成封闭，无新增观众进入</td><td><span class="status-chip dim">待确认</span></td>
+                </tr>
+              </table>
+            </div>
+            <div class="card">
+              <div class="card-title">引导员（1）</div>
+              <table class="tbl">
+                <tr><th>编号</th><th>任务</th><th>阶段</th><th>地点</th><th>时限(分)</th><th>完成标准</th><th>状态</th></tr>
+                <tr>
+                  <td class="mono">TASK-002</td><td>引导观众前往备用通道</td><td class="mono">P2</td><td>东侧观演区域</td><td class="mono">5</td>
+                  <td>东侧观众流量明显下降，备用通道通行顺畅</td><td><span class="status-chip dim">待确认</span></td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑤ 执行跟踪 -->
+        <div id="step-s5" hidden>
+          <div class="page-header"><div><h2>任务执行</h2><div class="sub">记录各岗位任务的实际执行情况</div></div>
+            <button class="btn danger plain" id="btnCloseEvent">结束事件</button></div>
+
+          <div class="grid-3">
+            <div class="card"><div class="card-title">总体完成率</div><div class="mono" style="font-size:26px;font-weight:700;" id="completionPct">0%</div><div style="font-size:11.5px;color:var(--muted);" id="completionFrac">0 / 2 已完成</div></div>
+            <div class="card" style="grid-column: span 2;">
+              <div class="card-title">各岗位进度</div>
+              <div style="margin-bottom:8px;">
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;"><span>保安</span><span id="progSecurityLabel">0/1</span></div>
+                <div class="progress-bar"><i id="progSecurity" style="width:0%"></i></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px;"><span>引导员</span><span id="progGuideLabel">0/1</span></div>
+                <div class="progress-bar"><i id="progGuide" style="width:0%"></i></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">任务列表</div>
+            <table class="tbl">
+              <tr><th>编号</th><th>任务</th><th>岗位</th><th>状态</th><th>操作</th></tr>
+              <tr data-task="1">
+                <td class="mono">TASK-001</td><td>设置东侧通道临时隔离</td><td>保安</td>
+                <td><span class="status-chip dim task-status">未开始</span></td>
+                <td>
+                  <button class="btn text" data-action="start">开始</button>
+                  <button class="btn text" data-action="complete" disabled>完成</button>
+                  <button class="btn text" data-action="fail" disabled>未完成</button>
+                </td>
+              </tr>
+              <tr data-task="2">
+                <td class="mono">TASK-002</td><td>引导观众前往备用通道</td><td>引导员</td>
+                <td><span class="status-chip dim task-status">未开始</span></td>
+                <td>
+                  <button class="btn text" data-action="start">开始</button>
+                  <button class="btn text" data-action="complete" disabled>完成</button>
+                  <button class="btn text" data-action="fail" disabled>未完成</button>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- ⑥ 复盘报告 -->
+        <div id="step-s6" hidden>
+          <div class="page-header"><div><h2>复盘报告</h2><div class="sub">基于事件、预案、任务执行记录自动生成复盘报告与改进建议</div></div></div>
+
+          <div class="card" id="reportEmptyCard">
+            <div class="card-title">尚未生成复盘报告</div>
+            <div class="btn-row">
+              <button class="btn primary" id="btnGenReport">AI 生成复盘报告</button>
+              <button class="btn" id="btnLoadSampleReport">载入示例复盘内容（演示兜底）</button>
+            </div>
+          </div>
+
+          <div id="reportContent" hidden>
+            <div class="grid-3">
+              <div class="card"><div class="card-title">任务总数</div><div class="mono" style="font-size:22px;">2</div></div>
+              <div class="card"><div class="card-title">已完成</div><div class="mono" style="font-size:22px;color:var(--teal);">2</div></div>
+              <div class="card"><div class="card-title">未完成 / 已取消</div><div class="mono" style="font-size:22px;color:var(--red);">0 / 0</div></div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">
+                <span>东侧通道设施故障事件复盘报告</span>
+                <div class="btns">
+                  <button class="btn primary">确认报告</button>
+                  <button class="btn" id="btnSaveCase">沉淀为案例</button>
+                  <button class="btn">导出 Word</button>
+                </div>
+              </div>
+              <h4>事件处置时间线</h4>
+              <ul style="margin:0 0 4px;padding-left:18px;">
+                <li>演出开始后30分钟 · 发现东侧通道设施故障</li>
+                <li>— · 应急预案确认</li>
+                <li>— · 岗位任务清单确认</li>
+                <li>— · 事件结束</li>
+              </ul>
+              <h4>岗位任务执行情况</h4>
+              <table class="tbl"><tr><th>岗位</th><th>任务数</th><th>完成数</th><th>完成率</th></tr>
+                <tr><td>保安</td><td>1</td><td>1</td><td><div class="progress-bar" style="width:120px;"><i style="width:100%"></i></div></td></tr>
+                <tr><td>引导员</td><td>1</td><td>1</td><td><div class="progress-bar" style="width:120px;"><i style="width:100%"></i></div></td></tr>
+              </table>
+              <div class="grid-2" style="margin-top:10px;">
+                <div>
+                  <h4>有效做法</h4><ul style="margin:0 0 6px;padding-left:18px;"><li>隔离带设置及时</li><li>引导员分流响应迅速</li></ul>
+                  <h4>存在问题</h4><ul style="margin:0;padding-left:18px;"><li>隔离带物资储备不足</li></ul>
+                </div>
+                <div>
+                  <h4>改进建议</h4>
+                  <p style="font-size:12.3px;color:var(--muted);margin:0 0 3px;">预案：增加物资冗余要求</p>
+                  <p style="font-size:12.3px;color:var(--muted);margin:0;">知识库：补充同类设施故障历史案例</p>
+                  <h4>案例沉淀标签</h4>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                    <span class="tag-chip">设施故障</span><span class="tag-chip">保安</span><span class="tag-chip">引导员</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 知识库后台 ============ -->
+      <section id="tab-knowledge" hidden>
+        <div class="page-header">
+          <div><h2>知识库后台</h2><div class="sub">应急预案、历史案例、岗位职责、场景资料等知识文档管理</div></div>
+          <button class="btn primary">+ 上传文档</button>
+        </div>
+        <div class="card">
+          <table class="tbl">
+            <tr><th>文档名称</th><th>分类</th><th>状态</th><th>版本</th></tr>
+            <tr><td>重大演绎活动现场应急预案</td><td>应急预案</td><td><span class="status-chip teal">已启用</span></td><td class="mono">v2</td></tr>
+            <tr><td>东侧拥堵处置复盘案例（2025）</td><td>历史案例</td><td><span class="status-chip teal">已启用</span></td><td class="mono">v1</td></tr>
+            <tr><td>引导员岗位职责标准</td><td>岗位职责</td><td><span class="status-chip teal">已启用</span></td><td class="mono">v1</td></tr>
+            <tr><td>船台公园场景资料</td><td>场景资料</td><td><span class="status-chip amber">解析中</span></td><td class="mono">v1</td></tr>
+          </table>
+        </div>
+        <div class="alert info">
+          <span class="ico">i</span>
+          <div><b>关于知识检索</b>文档上传后会自动解析并切分为片段，但向量检索（RAG）尚未接入 embedding，事件页「知识检索」步骤暂时无法命中这里的内容，仅作为知识库沉淀展示——这是当前真实状态，不是本原型简化掉的部分。</div>
+        </div>
+      </section>
+
+      <!-- ============ 本体对象视图（拟建设） ============ -->
+      <section id="tab-ontology" hidden>
+        <div class="alert info">
+          <span class="ico">NEW</span>
+          <div><b>这一块目前不在真实路由里</b>现有 Event / Plan / Task 数据模型里没有"通道""引导员"这类带稳定编号、可查询关系的对象；这里演示的是需求重构文档提出的本体层叠加上去之后，界面会长成什么样。</div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size:14.5px;margin:0 0 4px;">对象关系如何贯穿事件、任务与审批</h3>
+          <p style="font-size:12.5px;color:var(--muted);margin:0 0 12px;">同一个 PASS-E 编号，在地图、事件、任务和审批里指向同一个对象——这是本体驱动在界面上的样子，不是抽象说法。</p>
+          <div class="diagram-scroll">
+            <figure class="diagram">
+              <svg viewBox="0 0 920 260" role="img" aria-label="本体驱动决策流程：事件对象PASS-E连接通道核查任务、方案版本、人工审批和执行回执，所有环节引用同一组对象编号，最终状态回写本体并触发复盘">
+                <defs>
+                  <marker id="da" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M0,0 L10,5 L0,10 z" fill="currentColor"></path>
+                  </marker>
+                </defs>
+                <g font-family="Noto Sans SC, sans-serif" font-size="12" text-anchor="middle">
+                  <rect x="10" y="100" width="130" height="60" rx="7" fill="none" stroke="currentColor" stroke-width="1.2"></rect>
+                  <text x="75" y="126" fill="currentColor" font-family="JetBrains Mono, monospace" font-weight="700">INC-DEMO-01</text>
+                  <text x="75" y="144" fill="currentColor">事件对象</text>
+
+                  <rect x="180" y="30" width="130" height="56" rx="7" fill="var(--amber-soft)" stroke="var(--amber)" stroke-width="1.2"></rect>
+                  <text x="245" y="55" fill="currentColor" font-family="JetBrains Mono, monospace" font-weight="700">PASS-E</text>
+                  <text x="245" y="72" fill="currentColor">东侧主通道</text>
+
+                  <rect x="180" y="172" width="130" height="56" rx="7" fill="var(--amber-soft)" stroke="var(--amber)" stroke-width="1.2"></rect>
+                  <text x="245" y="197" fill="currentColor" font-family="JetBrains Mono, monospace" font-weight="700">PASS-N</text>
+                  <text x="245" y="214" fill="currentColor">北侧备用通道</text>
+
+                  <rect x="350" y="172" width="130" height="56" rx="7" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 3"></rect>
+                  <text x="415" y="197" fill="currentColor">核查任务</text>
+                  <text x="415" y="214" fill="currentColor" font-family="JetBrains Mono, monospace" font-size="10.5">TASK-CHK-01</text>
+
+                  <rect x="520" y="100" width="130" height="60" rx="7" fill="none" stroke="currentColor" stroke-width="1.2"></rect>
+                  <text x="585" y="122" fill="currentColor" font-family="JetBrains Mono, monospace" font-weight="700">PLAN-DEMO-01</text>
+                  <text x="585" y="140" fill="currentColor">方案版本 V1</text>
+                  <text x="585" y="155" fill="currentColor" font-size="10.5">目标对象 PASS-N</text>
+
+                  <rect x="690" y="30" width="130" height="56" rx="7" fill="var(--teal-soft)" stroke="var(--teal)" stroke-width="2"></rect>
+                  <text x="755" y="52" fill="var(--teal)" font-weight="700">人工审批</text>
+                  <text x="755" y="69" fill="var(--teal)" font-size="10.5">现场负责人</text>
+
+                  <rect x="690" y="172" width="130" height="56" rx="7" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="3 3"></rect>
+                  <text x="755" y="194" fill="currentColor">执行回执</text>
+                  <text x="755" y="211" fill="currentColor" font-family="JetBrains Mono, monospace" font-size="10.5">G1 / S3 / S4</text>
+                </g>
+                <g stroke="currentColor" stroke-width="1.2" marker-end="url(#da)">
+                  <line x1="140" y1="115" x2="178" y2="70"></line>
+                  <line x1="140" y1="145" x2="178" y2="197"></line>
+                  <line x1="310" y1="197" x2="348" y2="197"></line>
+                  <line x1="480" y1="185" x2="518" y2="140"></line>
+                  <line x1="650" y1="130" x2="688" y2="60"></line>
+                  <line x1="650" y1="140" x2="688" y2="197"></line>
+                </g>
+              </svg>
+              <figcaption>方框里的编号在事件卡、方案文档、审批记录里完全一致，点击任意入口都能追到同一个对象。</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">当前对象状态面板（演示样例）</div>
+          <div class="obj-grid" id="objGrid"></div>
+        </div>
+      </section>
+
+      <!-- ============ 教学实验台（拟建设） ============ -->
+      <section id="tab-teaching" hidden>
+        <div class="alert info">
+          <span class="ico">NEW</span>
+          <div><b>这一块目前不在真实路由里</b>现有系统是"一个人走完六步"的操作型应用；教学实验台是需求重构文档提出的新增能力——教师配置场景与扰动，学生配置 Agent 工作流，两者都在隔离环境里运行，不影响真实业务数据。</div>
+        </div>
+
+        <div class="grid-2">
+          <div>
+            <div class="card">
+              <div class="card-title">教师：实验场景配置</div>
+              <div class="field-row"><label class="field">场景模板</label>
+                <select><option>东侧通道故障与动态分流（主场景）</option><option>舞台及临建设施隐患闭环（扩展场景）</option></select>
+              </div>
+              <h4>扰动脚本</h4>
+              <div class="toggle-row"><div><div>降低模拟人员服从率</div><div class="sub">测试引导任务是否被正确标记为受阻</div></div><label class="switch"><input type="checkbox" checked><span class="track"></span></label></div>
+              <div class="toggle-row"><div><div>注入北侧通道临时受阻</div><div class="sub">触发效果偏差，验证自动重新研判</div></div><label class="switch"><input type="checkbox"><span class="track"></span></label></div>
+            </div>
+            <div class="card">
+              <div class="card-title">学生：Agent 工作流设计</div>
+              <div class="toggle-row"><div><div>态势研判 Agent</div><div class="sub">对象解析、影响分析、信息缺口</div></div><label class="switch"><input type="checkbox" checked><span class="track"></span></label></div>
+              <div class="toggle-row"><div><div>方案编排 Agent</div><div class="sub">检索依据、编排任务、生成候选方案</div></div><label class="switch"><input type="checkbox" checked><span class="track"></span></label></div>
+              <div class="toggle-row"><div><div>方案审查 Agent</div><div class="sub">最小闭环阶段可不启用</div></div><label class="switch"><input type="checkbox"><span class="track"></span></label></div>
+              <div class="btn-row" style="margin-top:12px;">
+                <button class="btn primary" id="btnRunExp">运行实验</button>
+                <button class="btn" id="btnGenExpReport">生成实验报告</button>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="card" id="runLogCard" hidden>
+              <div class="card-title">运行记录 · RUN-STU07-03</div>
+              <div id="runLog" style="font-size:12px;"></div>
+            </div>
+            <div class="card" id="expReportCard" hidden>
+              <div class="card-title">实验报告 · 量化评价</div>
+              <div class="metric-grid">
+                <div class="metric"><div class="val" style="color:var(--teal);">92%</div><div class="lbl">应急响应任务类型覆盖率</div></div>
+                <div class="metric"><div class="val" style="color:var(--amber);">1</div><div class="lbl">资源冲突检出数</div></div>
+                <div class="metric"><div class="val">4m12s</div><div class="lbl">响应与调整耗时</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  var TABS = {
+    "dashboard-link": ["态势大屏 · 链接到已有 DashboardView.vue 演示", "real"],
+    "activity": ["活动与场景 · 对应 ActivityListView / ActivityDetailView", "real"],
+    "event": ["事件处置 · 对应 EventStepper 六步真实流程", "real"],
+    "knowledge": ["知识库后台 · 对应 KnowledgeAdminView.vue", "real"],
+    "ontology": ["本体对象视图 · 需求重构文档新增，尚未进入真实路由", "proposed"],
+    "teaching": ["教学实验台 · 需求重构文档新增，尚未进入真实路由", "proposed"]
+  };
+  var navButtons = Array.prototype.slice.call(document.querySelectorAll(".sidebar nav.modules button"));
+  function activate(tab) {
+    navButtons.forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-tab") === tab); });
+    Object.keys(TABS).forEach(function (t) { document.getElementById("tab-" + t).hidden = (t !== tab); });
+    var info = TABS[tab];
+    document.getElementById("crumb").innerHTML = "<b>" + info[0].split(" · ")[0] + "</b> · " + info[0].split(" · ").slice(1).join(" · ");
+    var badge = document.getElementById("sourceBadge");
+    badge.textContent = info[1] === "real" ? "已有实现 · REAL" : "拟建设 · PROPOSED";
+    badge.className = "source-badge " + info[1];
+    window.scrollTo(0, 0);
+  }
+  navButtons.forEach(function (b) { b.addEventListener("click", function () { activate(b.getAttribute("data-tab")); }); });
+
+  function showToast(msg) {
+    var t = document.getElementById("toast");
+    t.textContent = msg; t.classList.add("show");
+    clearTimeout(showToast._h);
+    showToast._h = setTimeout(function () { t.classList.remove("show"); }, 2200);
+  }
+
+  document.getElementById("activityLink").addEventListener("click", function (e) { e.preventDefault(); });
+  document.getElementById("btnCreateEvent").addEventListener("click", function () { activate("event"); });
+  document.getElementById("eventLink").addEventListener("click", function (e) { e.preventDefault(); activate("event"); });
+
+  // ---------- event stepper ----------
+  var stepButtons = Array.prototype.slice.call(document.querySelectorAll("#eventStepper button"));
+  function goStep(step) {
+    stepButtons.forEach(function (b) { b.classList.toggle("active", b.getAttribute("data-step") === step); });
+    ["s1","s2","s3","s4","s5","s6"].forEach(function (s) { document.getElementById("step-" + s).hidden = (s !== step); });
+  }
+  stepButtons.forEach(function (b) { b.addEventListener("click", function () { goStep(b.getAttribute("data-step")); }); });
+
+  // input mode radio (visual only)
+  Array.prototype.slice.call(document.querySelectorAll(".radio-row button[data-mode]")).forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.querySelectorAll(".radio-row button[data-mode]").forEach(function (x) { x.classList.remove("active"); });
+      b.classList.add("active");
+    });
+  });
+
+  // ① event analyze / confirm
+  document.getElementById("btnAnalyzeEvent").addEventListener("click", function () {
+    document.getElementById("eventAnalyzed").hidden = false;
+    document.getElementById("eventConfirmRow").hidden = false;
+    document.getElementById("eventConfirmHint").textContent = "";
+    showToast("事件分析 Agent 已生成结构化结果");
+  });
+  document.getElementById("btnReanalyze").addEventListener("click", function () { showToast("已重新分析"); });
+  document.getElementById("btnConfirmEvent").addEventListener("click", function () {
+    document.getElementById("eventStatusChip").textContent = "已确认";
+    document.getElementById("eventStatusChip").className = "status-chip teal";
+    document.getElementById("eventConfirmHint").textContent = "事件已确认，可前往下一步「知识检索」";
+    document.getElementById("activityEventStatus").textContent = "已确认";
+    document.getElementById("activityEventStatus").className = "status-chip teal";
+    showToast("事件已确认");
+    setTimeout(function () { goStep("s2"); }, 500);
+  });
+
+  // ② knowledge retrieval — 如实复刻真实系统里 RAG 未接入的提示
+  document.getElementById("btnRetrieve").addEventListener("click", function () {
+    document.getElementById("ragAlert").hidden = false;
+    showToast("检索完成：相关预案/案例/岗位职责/场景知识 均为空");
+  });
+  document.getElementById("btnToPlan").addEventListener("click", function () { goStep("s3"); });
+
+  // ③ plan
+  function showPlan() {
+    document.getElementById("planEmptyCard").hidden = true;
+    document.getElementById("planContent").hidden = false;
+    document.getElementById("planStatusChip").hidden = false;
+    document.getElementById("planStatusChip").textContent = "预案待审核";
+    document.getElementById("planStatusChip").className = "status-chip amber";
+  }
+  document.getElementById("btnGenPlan").addEventListener("click", function () {
+    showToast('大模型服务尚未接入（llm_service.py），可点击"载入示例预案"走通演示流程');
+  });
+  document.getElementById("btnLoadSamplePlan").addEventListener("click", function () { showPlan(); showToast("已载入示例预案"); });
+  document.getElementById("btnRegenSection").addEventListener("click", function () { showToast("局部重新生成完成（该部分已更新）"); });
+  document.getElementById("btnConfirmPlan").addEventListener("click", function () {
+    document.getElementById("planStatusChip").textContent = "预案已确认";
+    document.getElementById("planStatusChip").className = "status-chip teal";
+    document.getElementById("activityEventStatus").textContent = "任务待生成";
+    document.getElementById("activityEventStatus").className = "status-chip amber";
+    showToast("预案已确认，可进入下一步：任务分解");
+    setTimeout(function () { goStep("s4"); }, 500);
+  });
+  document.getElementById("btnExportPlan").addEventListener("click", function () { showToast("已生成 Word 预案（演示模式，不产生真实下载）"); });
+
+  // ④ tasks
+  function showTasks() {
+    document.getElementById("taskEmptyCard").hidden = true;
+    document.getElementById("taskContent").hidden = false;
+  }
+  document.getElementById("btnGenTasks").addEventListener("click", function () {
+    showToast('大模型服务尚未接入，可点击"载入示例任务清单"走通演示流程');
+  });
+  document.getElementById("btnLoadSampleTasks").addEventListener("click", function () { showTasks(); showToast("已载入示例任务"); });
+  Array.prototype.slice.call(document.querySelectorAll(".radio-row button[data-group]")).forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.querySelectorAll(".radio-row button[data-group]").forEach(function (x) { x.classList.remove("active"); });
+      b.classList.add("active");
+      showToast("已按「" + b.textContent + "」重新分组");
+    });
+  });
+  var taskConfirmTries = 0;
+  document.getElementById("btnConfirmTasks").addEventListener("click", function () {
+    taskConfirmTries++;
+    if (taskConfirmTries === 1) {
+      document.getElementById("taskValidationAlert").hidden = false;
+      showToast("校验未通过：发现资源冲突（真实系统会返回 VALIDATION_FAILED）");
+      return;
+    }
+    document.getElementById("taskValidationAlert").hidden = true;
+    document.querySelectorAll("#taskContent .task-status, #tab-event .status-chip.dim").forEach(function () {});
+    showToast("任务清单已确认，可进入下一步：执行跟踪");
+    setTimeout(function () { goStep("s5"); }, 500);
+  });
+
+  // ⑤ execution
+  var taskState = { 1: "not_started", 2: "not_started" };
+  var STATUS_LABEL = { not_started: ["未开始", "dim"], in_progress: ["执行中", "blue"], completed: ["已完成", "teal"], incomplete: ["未完成", "red"] };
+  function renderExec() {
+    [1, 2].forEach(function (id) {
+      var row = document.querySelector('tr[data-task="' + id + '"]');
+      var st = taskState[id];
+      var chip = row.querySelector(".task-status");
+      chip.textContent = STATUS_LABEL[st][0];
+      chip.className = "status-chip task-status " + STATUS_LABEL[st][1];
+      row.querySelector('[data-action="start"]').disabled = st !== "not_started";
+      row.querySelector('[data-action="complete"]').disabled = st !== "in_progress";
+      row.querySelector('[data-action="fail"]').disabled = st !== "in_progress";
+    });
+    var completed = Object.values(taskState).filter(function (s) { return s === "completed"; }).length;
+    var pct = Math.round(completed / 2 * 100);
+    document.getElementById("completionPct").textContent = pct + "%";
+    document.getElementById("completionFrac").textContent = completed + " / 2 已完成";
+    var secDone = taskState[1] === "completed" ? 1 : 0;
+    var guideDone = taskState[2] === "completed" ? 1 : 0;
+    document.getElementById("progSecurity").style.width = (secDone * 100) + "%";
+    document.getElementById("progSecurityLabel").textContent = secDone + "/1";
+    document.getElementById("progGuide").style.width = (guideDone * 100) + "%";
+    document.getElementById("progGuideLabel").textContent = guideDone + "/1";
+  }
+  document.querySelectorAll("#step-s5 [data-action]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var row = btn.closest("tr");
+      var id = row.getAttribute("data-task");
+      var action = btn.getAttribute("data-action");
+      if (action === "start") taskState[id] = "in_progress";
+      if (action === "complete") taskState[id] = "completed";
+      if (action === "fail") taskState[id] = "incomplete";
+      renderExec();
+    });
+  });
+  renderExec();
+  document.getElementById("btnCloseEvent").addEventListener("click", function () {
+    showToast("未开始0 · 执行中0 · 未完成0 · 已完成2 · 已取消0 —— 事件已结束");
+    setTimeout(function () { goStep("s6"); }, 600);
+  });
+
+  // ⑥ report
+  document.getElementById("btnGenReport").addEventListener("click", function () {
+    showToast('大模型服务尚未接入，可点击"载入示例复盘内容"走通演示流程');
+  });
+  document.getElementById("btnLoadSampleReport").addEventListener("click", function () {
+    document.getElementById("reportEmptyCard").hidden = true;
+    document.getElementById("reportContent").hidden = false;
+    showToast("已载入示例复盘内容");
+  });
+  document.getElementById("btnSaveCase").addEventListener("click", function () { showToast("已沉淀为案例，写入知识库"); });
+
+  // ---------- ontology objects ----------
+  var OBJS = [
+    { id: "PASS-E", name: "东侧主通道", status: "不可通行", pill: "red" },
+    { id: "PASS-N", name: "北侧备用通道", status: "核查中", pill: "amber" },
+    { id: "ZONE-E", name: "东侧区域", status: "人数未知", pill: "dim" },
+    { id: "G1", name: "引导员", status: "可调用", pill: "teal" },
+    { id: "G2", name: "引导员", status: "分配冲突", pill: "amber" },
+    { id: "S1–S4", name: "保安", status: "在岗", pill: "teal" },
+    { id: "E1–E2", name: "设备保障", status: "核查中", pill: "amber" }
+  ];
+  var objGrid = document.getElementById("objGrid");
+  OBJS.forEach(function (o) {
+    var d = document.createElement("div");
+    d.className = "obj-card";
+    d.innerHTML = '<div class="obj-id mono">' + o.id + '</div><div class="obj-name">' + o.name + '</div><span class="status-chip ' + o.pill + '">' + o.status + '</span>';
+    d.addEventListener("click", function () { showToast(o.id + "：详情面板（演示未展开）"); });
+    objGrid.appendChild(d);
+  });
+
+  // ---------- teaching ----------
+  document.getElementById("btnRunExp").addEventListener("click", function () {
+    document.getElementById("runLogCard").hidden = false;
+    document.getElementById("runLog").innerHTML = [
+      "00:00 事件注入：东侧通道故障",
+      "00:04 态势研判 Agent：完成对象解析，列出3项信息缺口",
+      "00:09 方案编排 Agent：检索依据，生成候选方案 V1",
+      "00:11 资源检查：发现 G2 分配冲突",
+      "00:16 等待人工确认…"
+    ].map(function (r) { return '<div style="padding:5px 0;border-bottom:1px dashed var(--line);">' + r + '</div>'; }).join("");
+    showToast("实验运行完成，等待人工确认节点");
+  });
+  document.getElementById("btnGenExpReport").addEventListener("click", function () {
+    document.getElementById("expReportCard").hidden = false;
+    showToast("已生成实验报告");
+  });
+})();
+</script>

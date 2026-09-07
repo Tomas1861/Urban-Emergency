@@ -1,0 +1,244 @@
+<meta charset="utf-8">
+<title>三个月冲刺计划</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Noto+Sans+SC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #F3EEE3; --surface: #FFFFFF; --surface-alt: #EAE2D0;
+    --ink: #1E2A2E; --ink-muted: #5C6B70;
+    --accent: #1F6E7A; --accent-strong: #123F47; --accent-soft: #D7E7E4;
+    --warn: #A85A18; --warn-soft: #F1DFC5;
+    --crit: #B23A2E; --crit-soft: #F3DAD6;
+    --line: rgba(30, 42, 46, 0.15); --line-strong: rgba(30, 42, 46, 0.28);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #11181A; --surface: #1A2325; --surface-alt: #202B2C;
+      --ink: #E9EEEA; --ink-muted: #9BA9A8;
+      --accent: #63BCC5; --accent-strong: #96D6DC; --accent-soft: rgba(99,188,197,0.14);
+      --warn: #E3A25C; --warn-soft: rgba(227,162,92,0.14);
+      --crit: #E8776A; --crit-soft: rgba(232,119,106,0.16);
+      --line: rgba(233,238,234,0.14); --line-strong: rgba(233,238,234,0.26);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #11181A; --surface: #1A2325; --surface-alt: #202B2C;
+    --ink: #E9EEEA; --ink-muted: #9BA9A8;
+    --accent: #63BCC5; --accent-strong: #96D6DC; --accent-soft: rgba(99,188,197,0.14);
+    --warn: #E3A25C; --warn-soft: rgba(227,162,92,0.14);
+    --crit: #E8776A; --crit-soft: rgba(232,119,106,0.16);
+    --line: rgba(233,238,234,0.14); --line-strong: rgba(233,238,234,0.26);
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    line-height: 1.7; -webkit-font-smoothing: antialiased;
+    max-width: 100%; overflow-x: hidden;
+  }
+  h1, h2, h3 { font-family: "Noto Serif SC", "Songti SC", serif; font-weight: 800; text-wrap: balance; }
+  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 24px; }
+
+  header.hero { padding: 56px 0 34px; border-bottom: 1px solid var(--line); }
+  .eyebrow {
+    font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
+  }
+  header.hero h1 { font-size: clamp(26px, 4vw, 36px); line-height: 1.32; margin: 0 0 16px; }
+  header.hero p { font-size: 15.5px; color: var(--ink-muted); max-width: 680px; margin: 0; }
+
+  section { padding: 44px 0; border-bottom: 1px solid var(--line); }
+  section:last-of-type { border-bottom: none; }
+  .section-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+  .section-num {
+    font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--accent);
+    border: 1px solid var(--line-strong); border-radius: 999px; padding: 3px 10px; flex: none;
+  }
+  h2 { font-size: 21px; margin: 0; }
+  .section-sub { color: var(--ink-muted); font-size: 13.5px; margin: 10px 0 22px; max-width: 680px; }
+
+  /* priority legend */
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 22px; font-size: 13px; }
+  .legend .item { display: flex; align-items: center; gap: 7px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+  .dot.crit { background: var(--crit); }
+  .dot.warn { background: var(--warn); }
+  .dot.norm { background: var(--ink-muted); opacity: .5; }
+
+  /* start-now cards */
+  .now-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  @media (max-width: 800px) { .now-grid { grid-template-columns: 1fr; } }
+  .now-card {
+    background: var(--surface); border: 2px solid var(--crit); border-radius: 12px;
+    padding: 18px 20px; position: relative;
+  }
+  .now-card .who { font-family: "JetBrains Mono", monospace; font-size: 11.5px; color: var(--crit); font-weight: 700; letter-spacing: .04em; margin-bottom: 8px; }
+  .now-card h3 { font-size: 15px; margin: 0 0 8px; }
+  .now-card p { font-size: 13px; color: var(--ink-muted); margin: 0; }
+  .badge-crit {
+    display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px; font-weight: 700;
+    color: var(--crit); background: var(--crit-soft); border-radius: 999px; padding: 2px 9px;
+    margin-bottom: 10px; font-family: "JetBrains Mono", monospace; letter-spacing: .03em;
+  }
+
+  /* grid table: person x month */
+  .plan-table { display: grid; grid-template-columns: 120px repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .plan-table .cell { background: var(--surface); padding: 14px 15px; }
+  .plan-table .head { background: var(--surface-alt); font-weight: 700; font-size: 13px; display: flex; align-items: center; }
+  .plan-table .head.month { font-family: "JetBrains Mono", monospace; justify-content: center; color: var(--accent-strong); }
+  .plan-table .head.who { flex-direction: column; align-items: flex-start; justify-content: center; }
+  .plan-table .head.who .role { font-size: 10.5px; color: var(--ink-muted); font-weight: 500; font-family: "JetBrains Mono", monospace; margin-top: 2px; }
+  .task-list { display: flex; flex-direction: column; gap: 9px; }
+  .task {
+    display: flex; gap: 8px; align-items: flex-start; font-size: 12.6px; padding-left: 10px;
+    border-left: 3px solid var(--ink-muted); opacity: .72;
+  }
+  .task.crit { border-left-color: var(--crit); opacity: 1; font-weight: 600; }
+  .task.warn { border-left-color: var(--warn); opacity: 1; }
+  @media (max-width: 900px) {
+    .plan-table { grid-template-columns: 1fr; }
+    .plan-table .head.who { background: var(--accent-soft); }
+  }
+
+  .milestone {
+    background: var(--accent-soft); border: 1px solid var(--accent); border-radius: 12px;
+    padding: 22px 24px; margin-top: 8px;
+  }
+  .milestone .tag { font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--accent-strong); font-weight: 700; letter-spacing: .05em; margin-bottom: 8px; display: block; }
+  .milestone p { margin: 0; font-size: 14.5px; }
+  .milestone strong { color: var(--accent-strong); }
+
+  .not-doing {
+    background: var(--surface-alt); border: 1px dashed var(--line-strong);
+    border-radius: 12px; padding: 20px 24px;
+  }
+  .not-doing .head { font-weight: 700; font-size: 13.5px; color: var(--ink-muted); margin-bottom: 10px; }
+  .not-doing ul { margin: 0; padding-left: 20px; columns: 2; column-gap: 28px; }
+  .not-doing li { margin-bottom: 7px; font-size: 13px; color: var(--ink-muted); break-inside: avoid; }
+  @media (max-width: 700px) { .not-doing ul { columns: 1; } }
+
+  .why {
+    border-left: 3px solid var(--accent); padding: 3px 0 3px 16px; font-size: 13.5px; margin-top: 18px; color: var(--ink);
+  }
+
+  footer { padding: 36px 24px 60px; text-align: center; color: var(--ink-muted); font-size: 12.5px; }
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">演安智策 · 三人小组 · 三个月冲刺</div>
+    <h1>三个月只做成一件事：把"东通道故障"这条链路，从真事件到真回执，跑通一次。</h1>
+    <p>其余能力——资源冲突全套检测、教学实验台、第二场景、对照实验——全部推迟到三个月之后。这份计划只回答两个问题：<strong>现在从哪里开始</strong>，以及<strong>哪些事一旦拖了就会拖垮整条时间线</strong>。</p>
+  </header>
+
+  <section>
+    <div class="section-head"><span class="section-num">现在</span><h2>本周就开始的三件事</h2></div>
+    <p class="section-sub">不用等排期表生效——这三件事互不依赖，三个人今天就能各自动手。</p>
+    <div class="now-grid">
+      <div class="now-card">
+        <div class="who">成员 B · Agent与知识</div>
+        <span class="badge-crit">● 全项目最高优先级</span>
+        <h3>诊断 llm_service.py / rag_service.py 为什么不通</h3>
+        <p>是没配 key、没写调用逻辑，还是没接 embedding？先定位缺口，这决定了第1个月能不能如期修复——修不好，后面全线的"AI生成"都只是演示兜底数据。</p>
+      </div>
+      <div class="now-card">
+        <div class="who">成员 C · 前端与整合</div>
+        <span class="badge-crit">● 决策不做，后面重复劳动</span>
+        <h3>读完 Codex showcase，出一份取舍结论</h3>
+        <p>对比 <span class="mono">代码/frontend/src/showcase/</span> 和 Claude 静态原型，先决定"留谁、怎么合"，不急着写代码——决策错了，这个月的前端工作可能要推倒重来。</p>
+      </div>
+      <div class="now-card">
+        <div class="who">成员 A · 本体与行动</div>
+        <span class="badge-crit">● 后续两个月的前提</span>
+        <h3>梳理现有 Event/Plan/Task 字段缺口</h3>
+        <p>列出需要补的对象编号、证据状态字段清单（不用马上写代码）——这份清单是第1个月对象扩展和第2个月行动网关的起点。</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">01</span><h2>三个月排期：谁在什么时候做什么</h2></div>
+    <p class="section-sub">每一格里最上面、加粗标红边的任务是关键路径——拖了会连带影响其他人；黄边是重要但有一点缓冲；灰边（半透明）是有空再做，没做完不影响月底目标。</p>
+
+    <div class="legend">
+      <div class="item"><span class="dot crit"></span>阻塞 / 关键路径 —— 拖了就拖垮时间线</div>
+      <div class="item"><span class="dot warn"></span>重要，但有缓冲空间</div>
+      <div class="item"><span class="dot norm"></span>常规，做不完可顺延</div>
+    </div>
+
+    <div class="plan-table">
+      <div class="cell head"></div>
+      <div class="cell head month">第 1 月 · 修地基</div>
+      <div class="cell head month">第 2 月 · 跑通闭环</div>
+      <div class="cell head month">第 3 月 · 补安全阀</div>
+
+      <div class="cell head who">成员 A<span class="role">本体与行动</span></div>
+      <div class="cell"><div class="task-list">
+        <div class="task crit">完成最小对象字段扩展（通道/区域/执行单元编号、证据状态）</div>
+        <div class="task crit">起草动作契约（ActionType/ActionInstance）雏形</div>
+      </div></div>
+      <div class="cell"><div class="task-list">
+        <div class="task crit">行动网关最小实现：审批绑定版本、前置条件校验 —— 这是闭环里"人工批准"环节</div>
+      </div></div>
+      <div class="cell"><div class="task-list">
+        <div class="task warn">补 AC08：审批后关键状态变化，相关动作转待复核</div>
+        <div class="task warn">补 AC14：执行中任务的资源不被提前释放</div>
+      </div></div>
+
+      <div class="cell head who">成员 B<span class="role">Agent与知识</span></div>
+      <div class="cell"><div class="task-list">
+        <div class="task crit">修复 LLM 真实调用，至少跑通态势研判 + 方案编排两个 Agent</div>
+        <div class="task warn">RAG 先用关键词检索替代向量检索——先求"真实返回"，不追求语义精确</div>
+      </div></div>
+      <div class="cell"><div class="task-list">
+        <div class="task crit">两个 Agent 接入端到端链路：事件解析 → 生成结构化方案</div>
+      </div></div>
+      <div class="cell"><div class="task-list">
+        <div class="task warn">补 AC07：越权提案被网关拒绝时，Agent 侧要能正确展示拒绝原因</div>
+        <div class="task norm">知识引用尽量返回可定位来源，暂不追求命中率</div>
+      </div></div>
+
+      <div class="cell head who">成员 C<span class="role">前端与整合</span></div>
+      <div class="cell"><div class="task-list">
+        <div class="task crit">按取舍结论落地统一前端基线（Codex 版或合并版）</div>
+      </div></div>
+      <div class="cell"><div class="task-list">
+        <div class="task crit">把闭环做成可演示界面：事件录入→分析结果→方案展示→批准按钮→任务卡→回执</div>
+      </div></div>
+      <div class="cell"><div class="task-list">
+        <div class="task warn">补 AC11 相关界面：指令已发但无回执时，不能显示"现场已关闭"</div>
+        <div class="task norm">打磨演示效果，准备中期检查材料</div>
+      </div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">02</span><h2>月底唯一的硬指标</h2></div>
+    <div class="milestone">
+      <span class="tag">第 2 月末 · 验收方式：现场演示一次</span>
+      <p>能现场跑通<strong>"东通道故障 → AI 分析 → AI 生成方案 → 人工批准 → 任务派发 → 执行回执"</strong>完整一条链路，且链路里 AI 生成的部分是<strong>真实调用</strong>，不是演示兜底数据。这条链路能不能在月底跑通，是三个月里唯一不能打折扣的目标；第3月的安全阀补得多补得少，都建立在这条链路已经跑通的前提上。</p>
+    </div>
+    <div class="why">为什么盯这一条而不是齐头并进：需求重构稿12.4节的判断是先证明"对象统一、动作受控、状态可追溯"这一层本身站得住脚，再叠加其他能力——三个月的时间只够验证这一层，齐头并进会导致三个月后哪条线都没真正跑通。</div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="section-num">03</span><h2>这三个月明确不做</h2></div>
+    <p class="section-sub">不是不重要，是排在三个月之后——写清楚是为了防止中期检查时被质疑"范围缩水"，而不是悄悄放弃。</p>
+    <div class="not-doing">
+      <div class="head">推迟到三个月之后</div>
+      <ul>
+        <li>资源冲突 / 任务依赖全套检测（AC05 / AC06）</li>
+        <li>效果偏差自动触发重新研判（AC13）</li>
+        <li>教学实验台（教师配置、学生 Agent 工作流设计、隔离评分）</li>
+        <li>第二场景：舞台及临建设施隐患闭环</li>
+        <li>A / B / C / D 对照实验（本体贡献度量化）</li>
+        <li>AC01–AC20 全套验收 —— 三个月只挑 4 项关键项做（AC07/08/11/14）</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>演安智策 · 三个月冲刺计划 · 完整10个月排期见《开发计划-三人小组.md》</footer>
+</div>

@@ -1,0 +1,251 @@
+<meta charset="utf-8">
+<title>技术栈选型方案</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Noto+Sans+SC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #F3EEE3; --surface: #FFFFFF; --surface-alt: #EAE2D0;
+    --ink: #1E2A2E; --ink-muted: #5C6B70;
+    --accent: #1F6E7A; --accent-strong: #123F47; --accent-soft: #D7E7E4;
+    --warn: #A85A18; --warn-soft: #F1DFC5;
+    --good: #2F7D4F; --good-soft: #DCEEE0;
+    --line: rgba(30, 42, 46, 0.15); --line-strong: rgba(30, 42, 46, 0.28);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #11181A; --surface: #1A2325; --surface-alt: #202B2C;
+      --ink: #E9EEEA; --ink-muted: #9BA9A8;
+      --accent: #63BCC5; --accent-strong: #96D6DC; --accent-soft: rgba(99,188,197,0.14);
+      --warn: #E3A25C; --warn-soft: rgba(227,162,92,0.14);
+      --good: #6FCB94; --good-soft: rgba(111,203,148,0.14);
+      --line: rgba(233,238,234,0.14); --line-strong: rgba(233,238,234,0.26);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #11181A; --surface: #1A2325; --surface-alt: #202B2C;
+    --ink: #E9EEEA; --ink-muted: #9BA9A8;
+    --accent: #63BCC5; --accent-strong: #96D6DC; --accent-soft: rgba(99,188,197,0.14);
+    --warn: #E3A25C; --warn-soft: rgba(227,162,92,0.14);
+    --good: #6FCB94; --good-soft: rgba(111,203,148,0.14);
+    --line: rgba(233,238,234,0.14); --line-strong: rgba(233,238,234,0.26);
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    line-height: 1.75; -webkit-font-smoothing: antialiased;
+    max-width: 100%; overflow-x: hidden; font-size: 15px;
+  }
+  h1, h2, h3 { font-family: "Noto Serif SC", "Songti SC", serif; font-weight: 800; text-wrap: balance; }
+  .mono, code { font-family: "JetBrains Mono", ui-monospace, monospace; }
+  code { background: var(--surface-alt); padding: 1px 5px; border-radius: 4px; font-size: 0.88em; }
+  a { color: var(--accent); }
+
+  nav.toc {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--bg) 90%, transparent);
+    backdrop-filter: blur(10px); border-bottom: 1px solid var(--line);
+  }
+  nav.toc .inner {
+    max-width: 900px; margin: 0 auto; padding: 0 20px;
+    display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none;
+  }
+  nav.toc .inner::-webkit-scrollbar { display: none; }
+  nav.toc a {
+    flex: none; padding: 12px 10px 10px; font-size: 12.5px; font-weight: 500;
+    color: var(--ink-muted); text-decoration: none; border-bottom: 2px solid transparent; white-space: nowrap;
+  }
+  nav.toc a.active { color: var(--accent-strong); border-bottom-color: var(--accent); }
+
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+
+  header.hero { padding: 48px 0 30px; border-bottom: 1px solid var(--line); }
+  header.hero h1 { font-size: clamp(24px, 3.6vw, 32px); line-height: 1.35; margin: 0 0 14px; }
+  .subtitle-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 18px; font-size: 13.5px; color: var(--ink-muted);
+  }
+
+  section.sec { padding: 38px 0; border-bottom: 1px solid var(--line); }
+  section.sec:last-of-type { border-bottom: none; }
+  h2 { font-size: 20px; margin: 0 0 16px; }
+  h3 { font-size: 15.5px; margin: 26px 0 10px; color: var(--accent-strong); }
+  h3:first-child { margin-top: 0; }
+  p { margin: 0 0 13px; }
+  strong { font-weight: 700; }
+  ul, ol { margin: 0 0 14px; padding-left: 22px; }
+  li { margin-bottom: 6px; }
+
+  /* decision cards: pick / avoid */
+  .decision-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0 16px; }
+  @media (max-width: 640px) { .decision-grid { grid-template-columns: 1fr; } }
+  .dcard { border-radius: 10px; padding: 13px 16px; font-size: 13px; }
+  .dcard.pick { background: var(--good-soft); border: 1px solid var(--good); }
+  .dcard.avoid { background: var(--warn-soft); border: 1px solid color-mix(in srgb, var(--warn) 45%, transparent); }
+  .dcard .tag { font-family: "JetBrains Mono", monospace; font-size: 10.5px; font-weight: 700; letter-spacing: .04em; margin-bottom: 6px; display: block; }
+  .dcard.pick .tag { color: var(--good); }
+  .dcard.avoid .tag { color: var(--warn); }
+
+  .tbl-scroll { overflow-x: auto; margin: 14px 0; border: 1px solid var(--line); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; background: var(--surface); }
+  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { background: var(--surface-alt); font-family: "JetBrains Mono", monospace; font-weight: 600; font-size: 11px; color: var(--ink-muted); }
+  tr:last-child td { border-bottom: none; }
+
+  .upgrade-note {
+    border-left: 3px solid var(--accent); padding: 3px 0 3px 14px; font-size: 13.5px; margin: 10px 0 16px; color: var(--ink);
+  }
+
+  footer { padding: 36px 24px 60px; text-align: center; color: var(--ink-muted); font-size: 12.5px; }
+</style>
+
+<nav class="toc" id="tocNav">
+  <div class="inner">
+    <a href="#s1">一 数据库</a>
+    <a href="#s2">二 AI能力</a>
+    <a href="#s3">三 后端</a>
+    <a href="#s4">四 前端</a>
+    <a href="#s5">五 测试</a>
+    <a href="#s6">六 部署</a>
+    <a href="#s7">七 新装清单</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <header class="hero">
+    <h1>整体技术栈选型方案</h1>
+    <div class="subtitle-card">
+      延续《Ontology基座技术方案》的选型原则：3人研究生团队、一年期、49万经费，优先选"团队学得快、部署运维简单"的技术，不追求业界最佳实践——如果那意味着额外的运维负担。能用现有代码库已经在用的技术解决的问题，不引入新组件。
+    </div>
+  </header>
+
+  <section class="sec" id="s1">
+    <h2>一、数据库：三种能力，不需要三个数据库服务</h2>
+
+    <h3>1.1 关系数据存储 —— 继续用 SQLite，何时切换 PostgreSQL</h3>
+    <p>现状：<code>backend/yingji_mvp.db</code>（SQLite），SQLAlchemy + Alembic。<strong>三个月冲刺阶段维持 SQLite 不动</strong>——单机、免安装、Alembic 迁移脚本不用改。</p>
+    <p><strong>需要切换到 PostgreSQL 的时机</strong>：教学实验台上线、多组学生并发写入的时候。SQLite 在多进程并发写入时会有锁等待问题，教学场景一旦有 5+ 组学生同时点"运行实验"，会明显卡顿。切换成本不高——SQLAlchemy 已经做了数据库无关的抽象，只要现有代码没用 SQLite 专属语法，改一下 <code>DATABASE_URL</code> 和 Alembic 配置就行，不需要重写模型。</p>
+    <div class="upgrade-note"><strong>不建议</strong>：现在就上 PostgreSQL。规模没到，徒增本地开发和部署的环境依赖。</div>
+
+    <h3>1.2 知识检索 —— 不引入独立向量数据库</h3>
+    <p>需求重构稿要求的"知识检索"，技术上分两档，<strong>建议从第一档开始</strong>：</p>
+    <div class="decision-grid">
+      <div class="dcard pick">
+        <span class="tag">第一档 · 三个月冲刺就做</span>
+        关键词检索。用 <code>rank_bm25</code> 对已解析的文档片段做 BM25 检索，不需要任何 embedding 模型、不需要向量数据库。对应真实限制——<code>rag_service.py</code> 现在返回空，先把这一档跑通，就已经比"返回空"是质的提升。
+      </div>
+      <div class="dcard pick">
+        <span class="tag">第二档 · 三个月之后</span>
+        本地开源中文 embedding 模型（BGE系列，用 <code>sentence-transformers</code> 跑，免费）算向量，用 <code>sqlite-vec</code>（SQLite）或 <code>pgvector</code>（已切Postgres）存和查——都是"在现有数据库上加扩展"，不是新增服务。
+      </div>
+    </div>
+    <div class="dcard avoid" style="margin-bottom:16px;">
+      <span class="tag">明确不建议</span>
+      Milvus、Weaviate、Pinecone 这类专用向量数据库——是给"千万级向量、独立检索集群"场景用的，教学项目知识库大概率几十到几百篇文档，用不上，还平白多一个要学、要运维的服务。
+    </div>
+
+    <h3>1.3 图数据库 —— 不用（已装的 Neo4j 驱动可以先不接）</h3>
+    <p>理由同《Ontology基座技术方案》：对象规模小，关系查询用 SQL JOIN 够用。除非以后真的出现需要多跳图遍历的复杂查询，否则不需要图数据库。</p>
+
+    <h3>1.4 后台任务调度 —— 用 APScheduler，不需要 Celery + Redis</h3>
+    <p>需求重构稿 14.3 节要求的"状态变化与待发送事件一并可靠保存，由后台任务投递"，典型场景是"效果监测的观察窗口超时检测"。</p>
+    <p><strong>建议</strong>：<code>APScheduler</code>，跑在 FastAPI 同一个进程里，配置一份定时任务定期扫描"观察窗口已过期但未达标"的方案。不需要额外部署 Redis 和 Celery worker。</p>
+    <div class="upgrade-note">升级时机：任务量大到单进程定时扫描处理不过来（教学实验台多组并发触发大量偏差检测）时，再引入 Celery + Redis。三个月冲刺阶段用不到。</div>
+  </section>
+
+  <section class="sec" id="s2">
+    <h2>二、AI 能力：LLM、Embedding、Agent 编排</h2>
+
+    <h3>2.1 大模型 API 选型</h3>
+    <p><code>llm_service.py</code> 目前未接入。选型考虑三点：中文效果、结构化输出（function calling / JSON mode）能力、成本。</p>
+    <div class="decision-grid">
+      <div class="dcard pick">
+        <span class="tag">候选 · 优先考虑</span>
+        国产 API（通义千问、DeepSeek、智谱 GLM-4 等）：性价比高，中文语境效果好，国内网络直接可用，教学演示场景不需要顶级模型能力。
+      </div>
+      <div class="dcard pick">
+        <span class="tag">候选 · 备选</span>
+        OpenAI / Claude API：效果更好，但成本更高，且需要考虑网络访问的稳定性——如果已有可用渠道，也是合理选择。
+      </div>
+    </div>
+    <p><strong>硬性要求</strong>：无论选哪家，必须支持结构化输出（function calling 或 JSON mode）——需求重构稿反复强调"模型不能自行改写结果"，这不是靠 prompt 里写"请输出JSON"就能可靠保证的，要用 API 原生的结构化输出能力。</p>
+
+    <h3>2.2 Embedding 模型</h3>
+    <p>见上文 1.2 第二档：本地开源模型（BGE 系列），跑在自己的机器上，不调用付费 embedding API——一年期项目如果知识库要反复重新索引，调用付费 embedding API 的成本会累积，本地模型是控制成本的具体一点。</p>
+
+    <h3>2.3 Agent 编排 —— 不引入 LangChain / LangGraph 类框架</h3>
+    <div class="decision-grid">
+      <div class="dcard pick">
+        <span class="tag">建议</span>
+        直接用所选大模型 API 的原生 tool use / function calling，配合团队自己写的 Python 控制流程（<code>backend/app/agents/</code> 现有结构就是这个思路，继续沿用）。
+      </div>
+      <div class="dcard avoid">
+        <span class="tag">为什么不用重型框架</span>
+        抽象层多，出问题时不好调试。需求重构稿要求"运行控制器由程序负责……不能用'多个Agent都赞同'替代规则引擎"——自己写清楚的状态机，比塞进通用框架的抽象里更可控、更容易审计。
+      </div>
+    </div>
+    <p>这也是需求重构稿引用的 Anthropic《Building effective agents》一文的核心建议：优先用简单、可组合的模式，不要一开始就上框架。</p>
+  </section>
+
+  <section class="sec" id="s3">
+    <h2>三、后端框架 —— 现状已经合适，不需要换</h2>
+    <p><code>FastAPI + SQLAlchemy 2.0 + Alembic + Pydantic</code>（<code>backend/pyproject.toml</code>）已经是这个项目规模的合理选择：FastAPI 的类型系统和自动文档天然适合"结构化输入输出"这种需求密集的场景，Pydantic 的校验正好用来约束 Agent 的结构化输出格式。<strong>不需要引入任何新的后端框架组件</strong>，接下来的工作是在这套骨架里把模型、服务、Agent 填充完整，不是换地基。</p>
+  </section>
+
+  <section class="sec" id="s4">
+    <h2>四、前端框架 —— 现状已经合适，不需要换</h2>
+    <p><code>Vue3 + Element Plus + Pinia + Vite</code>（<code>frontend/</code>）同理，不需要新增技术栈。教学实验台、本体对象视图这些新页面，按现有的 <code>views/</code> 组织方式继续加就行。</p>
+  </section>
+
+  <section class="sec" id="s5">
+    <h2>五、测试策略</h2>
+    <p>后端已有 <code>pytest</code> 依赖。补充两类当前缺失的测试：</p>
+    <ul>
+      <li><strong>Agent 测试用 mock 大模型响应</strong>，不要在自动化测试里真的调用 LLM API（慢、花钱、结果不确定）。给 <code>llm_service.py</code> 加一层可替换的接口，测试时注入固定返回值，验证的是"Agent 拿到这个返回值后，状态流转对不对"，不是"模型这次答得好不好"。</li>
+      <li><strong>本体服务的边界场景测试</strong>：别名歧义时是否正确返回歧义列表而不是擅自选一个、证据过期时是否正确拒绝把状态当已确认用——这两条直接对应 AC01、AC02，写成自动化测试比每次人工点一遍界面可靠。</li>
+    </ul>
+  </section>
+
+  <section class="sec" id="s6">
+    <h2>六、部署</h2>
+    <p><strong>Docker Compose</strong> 足够：一个 backend 容器 + 前端构建产物用 Nginx 或简单静态服务器托管（若切换 PostgreSQL 再加一个数据库容器）。<strong>不需要 Kubernetes</strong>——这个规模的教学演示系统上 K8s 是纯粹的运维负担，没有对应的收益（不需要自动扩缩容、不需要多可用区）。</p>
+  </section>
+
+  <section class="sec" id="s7">
+    <h2>七、三个月冲刺阶段，实际需要新装的东西</h2>
+    <p>避免被上面一整篇吓到——真正需要在三个月里新装的依赖其实不多：</p>
+    <div class="tbl-scroll"><table>
+      <tr><th>需要装的</th><th>用途</th><th>什么时候装</th></tr>
+      <tr><td>所选大模型 API 的 Python SDK</td><td>接入 LLM</td><td>第1周（成员B）</td></tr>
+      <tr><td><code>rank_bm25</code></td><td>关键词检索</td><td>第1周（成员B）</td></tr>
+      <tr><td><code>apscheduler</code></td><td>效果监测定时任务</td><td>第6-7月，三个月冲刺阶段不需要</td></tr>
+      <tr><td>其余（SQLAlchemy/Alembic/FastAPI/Vue/Element Plus）</td><td>已经在用</td><td>不用新装</td></tr>
+    </table></div>
+    <p style="font-size:13px;color:var(--ink-muted);">
+      <code>sentence-transformers</code>（本地 embedding）、<code>sqlite-vec</code>/<code>pgvector</code>（向量检索）、PostgreSQL、Celery+Redis、Docker Compose 部署——这些全部排在三个月冲刺之后，现在不用碰。
+    </p>
+  </section>
+
+  <footer>演安智策 · 整体技术栈选型方案</footer>
+</div>
+
+<script>
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll("#tocNav a"));
+  var sections = links.map(function (a) { return document.querySelector(a.getAttribute("href")); }).filter(Boolean);
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      var id = "#" + entry.target.id;
+      var link = links.find(function (a) { return a.getAttribute("href") === id; });
+      if (!link) return;
+      if (entry.isIntersecting) {
+        links.forEach(function (a) { a.classList.remove("active"); });
+        link.classList.add("active");
+      }
+    });
+  }, { rootMargin: "-35% 0px -60% 0px", threshold: 0 });
+  sections.forEach(function (s) { io.observe(s); });
+})();
+</script>

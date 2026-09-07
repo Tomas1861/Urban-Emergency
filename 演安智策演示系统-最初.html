@@ -1,0 +1,757 @@
+
+<!-- saved from url=(0168)file:///Users/zhou/Desktop/%E9%87%8F%E5%AD%90%E5%9F%8E%E5%B8%82%E5%B9%B3%E5%8F%B0/%E5%A4%8D%E5%85%B4%E5%B2%9B%E5%BA%94%E6%80%A5%E6%BC%94%E7%A4%BA%E7%B3%BB%E7%BB%9F.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>演安智策演示系统</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+<link href="./演安智策演示系统-最初_files/css2" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #F3EEE3; --surface: #FFFFFF; --surface-alt: #EAE2D0;
+    --ink: #1E2A2E; --ink-muted: #5C6B70;
+    --accent: #1F6E7A; --accent-strong: #123F47; --accent-soft: #D7E7E4;
+    --warn: #A85A18; --warn-soft: #F1DFC5;
+    --good: #2F7D4F; --good-soft: #DCEEE0;
+    --line: rgba(30, 42, 46, 0.14); --line-strong: rgba(30, 42, 46, 0.26);
+    --shadow: 0 1px 2px rgba(20,30,33,.06), 0 8px 24px -12px rgba(20,30,33,.18);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #11181A; --surface: #1A2325; --surface-alt: #202B2C;
+      --ink: #E9EEEA; --ink-muted: #9BA9A8;
+      --accent: #63BCC5; --accent-strong: #96D6DC; --accent-soft: rgba(99,188,197,0.14);
+      --warn: #E3A25C; --warn-soft: rgba(227,162,92,0.14);
+      --good: #6FCB94; --good-soft: rgba(111,203,148,0.14);
+      --line: rgba(233,238,234,0.14); --line-strong: rgba(233,238,234,0.26);
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #11181A; --surface: #1A2325; --surface-alt: #202B2C;
+    --ink: #E9EEEA; --ink-muted: #9BA9A8;
+    --accent: #63BCC5; --accent-strong: #96D6DC; --accent-soft: rgba(99,188,197,0.14);
+    --warn: #E3A25C; --warn-soft: rgba(227,162,92,0.14);
+    --good: #6FCB94; --good-soft: rgba(111,203,148,0.14);
+    --line: rgba(233,238,234,0.14); --line-strong: rgba(233,238,234,0.26);
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.5);
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    -webkit-font-smoothing: antialiased; font-size: 14px; line-height: 1.6;
+    max-width: 100%; overflow-x: hidden;
+  }
+  h1,h2,h3,.display { font-family: "Noto Serif SC","Songti SC",serif; font-weight: 800; text-wrap: balance; }
+  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  button { font-family: inherit; cursor: pointer; }
+  button:focus-visible, input:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .app { display: flex; min-height: 100vh; }
+
+  /* Sidebar */
+  .sidebar {
+    width: 216px; flex: none; background: var(--surface); border-right: 1px solid var(--line);
+    padding: 20px 12px; position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+  .brand { padding: 4px 10px 18px; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+  .brand .name { font-family: "Noto Serif SC", serif; font-weight: 800; font-size: 16px; }
+  .brand .sub { font-size: 11px; color: var(--ink-muted); font-family: "JetBrains Mono", monospace; margin-top: 3px; }
+  .activity-chip {
+    margin: 0 2px 16px; padding: 8px 10px; background: var(--accent-soft); border-radius: 8px;
+    font-size: 11.5px; color: var(--accent-strong);
+  }
+  .activity-chip b { display: block; font-size: 12.5px; margin-bottom: 2px; }
+  nav.modules { display: flex; flex-direction: column; gap: 2px; }
+  nav.modules button {
+    display: flex; align-items: center; gap: 10px; text-align: left; width: 100%;
+    padding: 9px 10px; border-radius: 8px; border: none; background: none; color: var(--ink-muted);
+    font-size: 13px; font-weight: 500;
+  }
+  nav.modules button .ico {
+    width: 20px; height: 20px; flex: none; display: flex; align-items: center; justify-content: center;
+    font-family: "JetBrains Mono", monospace; font-size: 11px; border-radius: 5px;
+    background: var(--surface-alt); color: var(--ink-muted);
+  }
+  nav.modules button.active { background: var(--accent-soft); color: var(--accent-strong); font-weight: 700; }
+  nav.modules button.active .ico { background: var(--accent); color: var(--surface); }
+  nav.modules button:hover:not(.active) { background: var(--surface-alt); }
+  .sidebar-foot { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 11px; color: var(--ink-muted); }
+  .sidebar-foot a { color: var(--accent); }
+
+  /* Main */
+  .main { flex: 1; min-width: 0; }
+  .topbar {
+    position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--bg) 90%, transparent);
+    backdrop-filter: blur(8px); border-bottom: 1px solid var(--line);
+    padding: 16px 28px; display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  }
+  .topbar h1 { font-size: 19px; margin: 0; }
+  .topbar .desc { font-size: 12.5px; color: var(--ink-muted); margin-top: 3px; }
+  .demo-badge {
+    font-family: "JetBrains Mono", monospace; font-size: 10.5px; letter-spacing: .04em;
+    color: var(--warn); border: 1px solid color-mix(in srgb, var(--warn) 45%, transparent);
+    background: var(--warn-soft); padding: 3px 9px; border-radius: 999px; flex: none;
+  }
+  .content { padding: 24px 28px 60px; max-width: 1180px; }
+  [hidden] { display: none !important; }
+
+  /* Generic building blocks */
+  .grid-2 { display: grid; grid-template-columns: 1.1fr 1fr; gap: 18px; align-items: start; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px;
+  }
+  .card + .card { margin-top: 14px; }
+  .card h3 { font-size: 14.5px; margin: 0 0 4px; }
+  .card .hint { font-size: 12px; color: var(--ink-muted); margin-bottom: 12px; }
+
+  .pill {
+    display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600;
+    padding: 2px 9px; border-radius: 999px; font-family: "JetBrains Mono", monospace;
+  }
+  .pill.good { background: var(--good-soft); color: var(--good); }
+  .pill.warn { background: var(--warn-soft); color: var(--warn); }
+  .pill.neutral { background: var(--surface-alt); color: var(--ink-muted); }
+  .pill.accent { background: var(--accent-soft); color: var(--accent-strong); }
+  .pill::before { content: "●"; font-size: 8px; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px; border-radius: 8px; padding: 8px 14px;
+    font-size: 13px; font-weight: 600; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink);
+  }
+  .btn:hover { background: var(--surface-alt); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+  .btn.primary:hover { background: var(--accent-strong); border-color: var(--accent-strong); }
+  .btn.ghost { border-color: transparent; background: none; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+
+  input[type="text"], textarea, select {
+    width: 100%; font-family: inherit; font-size: 13.5px; padding: 9px 11px;
+    border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface); color: var(--ink);
+  }
+  textarea { resize: vertical; min-height: 84px; line-height: 1.6; }
+  label.field { display: block; font-size: 12px; color: var(--ink-muted); margin: 0 0 5px; font-weight: 600; }
+  .field-group { margin-bottom: 14px; }
+
+  /* Tab strip (in-page) */
+  .subtabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 16px; flex-wrap: wrap; }
+  .subtabs button {
+    border: none; background: none; padding: 9px 4px; margin-right: 16px; font-size: 13px; font-weight: 600;
+    color: var(--ink-muted); border-bottom: 2px solid transparent;
+  }
+  .subtabs button.active { color: var(--accent-strong); border-bottom-color: var(--accent); }
+
+  /* Library list */
+  .lib-toolbar { display: flex; gap: 10px; margin-bottom: 14px; }
+  .lib-toolbar input { flex: 1; }
+  .lib-list { display: flex; flex-direction: column; gap: 8px; }
+  .lib-item {
+    display: flex; align-items: center; gap: 14px; padding: 12px 14px; border: 1px solid var(--line);
+    border-radius: 10px; background: var(--surface);
+  }
+  .lib-item .lib-id { font-family: "JetBrains Mono", monospace; font-size: 11px; color: var(--ink-muted); flex: none; width: 108px; }
+  .lib-item .lib-title { font-weight: 600; font-size: 13.5px; flex: 1; min-width: 0; }
+  .lib-item .lib-meta { font-size: 11.5px; color: var(--ink-muted); flex: none; }
+  .lib-item .lib-tags { display: flex; gap: 6px; flex: none; }
+
+  /* Evidence / gap chips */
+  .chip-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .chip {
+    font-size: 12px; padding: 5px 10px; border-radius: 999px; border: 1px solid var(--line-strong);
+    background: var(--surface-alt); color: var(--ink);
+  }
+  .chip.unknown { border-color: color-mix(in srgb, var(--warn) 50%, transparent); color: var(--warn); background: var(--warn-soft); }
+
+  .kv-list { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
+  .kv-list .row { display: flex; gap: 10px; font-size: 13px; align-items: baseline; }
+  .kv-list .k { flex: none; width: 108px; color: var(--ink-muted); font-size: 12px; }
+
+  .timeline { display: flex; flex-direction: column; gap: 0; margin: 8px 0; }
+  .tl-item { display: flex; gap: 12px; padding: 8px 0; border-bottom: 1px dashed var(--line); font-size: 12.8px; }
+  .tl-item:last-child { border-bottom: none; }
+  .tl-item .t { font-family: "JetBrains Mono", monospace; color: var(--ink-muted); flex: none; width: 56px; }
+
+  .plan-doc { font-size: 13.5px; }
+  .plan-doc h4 { font-size: 13px; color: var(--accent-strong); margin: 14px 0 6px; }
+  .plan-doc h4:first-child { margin-top: 0; }
+  .plan-doc ul { margin: 0 0 4px; padding-left: 20px; }
+  .plan-doc li { margin-bottom: 4px; }
+  .cite { font-family: "JetBrains Mono", monospace; font-size: 10.5px; color: var(--accent); }
+
+  .diff-add { background: color-mix(in srgb, var(--good) 16%, transparent); border-radius: 3px; padding: 0 3px; }
+  .diff-del { background: color-mix(in srgb, var(--warn) 16%, transparent); text-decoration: line-through; border-radius: 3px; padding: 0 3px; }
+
+  .obj-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+  .obj-card {
+    border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--surface); cursor: pointer;
+  }
+  .obj-card:hover { border-color: var(--accent); }
+  .obj-card .obj-id { font-family: "JetBrains Mono", monospace; font-size: 11px; font-weight: 700; }
+  .obj-card .obj-name { font-size: 12px; color: var(--ink-muted); margin: 3px 0 8px; }
+
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-row .lbl { font-size: 13px; }
+  .toggle-row .sub { font-size: 11.5px; color: var(--ink-muted); }
+  .switch { position: relative; width: 38px; height: 21px; flex: none; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch .track {
+    position: absolute; inset: 0; background: var(--line-strong); border-radius: 999px; transition: background .15s;
+  }
+  .switch .track::before {
+    content: ""; position: absolute; width: 15px; height: 15px; left: 3px; top: 3px; background: var(--surface);
+    border-radius: 50%; transition: transform .15s;
+  }
+  .switch input:checked + .track { background: var(--accent); }
+  .switch input:checked + .track::before { transform: translateX(17px); }
+  @media (prefers-reduced-motion: reduce) { .switch .track, .switch .track::before { transition: none; } }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--accent-strong); color: var(--surface); padding: 11px 20px; border-radius: 999px;
+    font-size: 13px; font-weight: 600; box-shadow: var(--shadow); opacity: 0; pointer-events: none;
+    transition: opacity .2s, transform .2s; z-index: 100;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  @media (prefers-reduced-motion: reduce) { .toast { transition: none; } }
+
+  .diagram-scroll { overflow-x: auto; }
+  figure.diagram { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 8px 8px; color: var(--ink); }
+  figure.diagram svg { display: block; width: 100%; height: auto; }
+  figure.diagram figcaption { font-size: 12px; color: var(--ink-muted); text-align: center; padding: 10px 14px 2px; }
+
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 12px; }
+  .metric {
+    border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; background: var(--surface);
+  }
+  .metric .val { font-family: "JetBrains Mono", monospace; font-size: 22px; font-weight: 700; color: var(--accent-strong); }
+  .metric .lbl { font-size: 11.5px; color: var(--ink-muted); margin-top: 2px; }
+
+  .note-box { background: var(--accent-soft); border-radius: 10px; padding: 12px 16px; font-size: 12.5px; color: var(--accent-strong); margin: 14px 0; }
+</style>
+
+</head><body><div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="name">演安智策</div>
+      <div class="sub">复兴岛应急协同演示系统</div>
+    </div>
+    <div class="activity-chip">
+      <b>当前活动</b>
+      ACT-2026-09 · 复兴岛船台公园音乐节 · 演示模式
+    </div>
+    <nav class="modules" id="moduleNav">
+      <button data-tab="library" class=""><span class="ico">01</span>知识与场景库</button>
+      <button data-tab="incident" class=""><span class="ico">02</span>事件与态势工作台</button>
+      <button data-tab="plan" class=""><span class="ico">03</span>方案生成与审核</button>
+      <button data-tab="ontology" class=""><span class="ico">04</span>本体驱动决策流程</button>
+      <button data-tab="teaching" class="active"><span class="ico">05</span>虚拟推演教学实验台</button>
+    </nav>
+    <div class="sidebar-foot">
+      全部数据为教学演示样例，不代表复兴岛实测布局或正式处置标准。参见 <a href="file:///Users/zhou/Desktop/%E9%87%8F%E5%AD%90%E5%9F%8E%E5%B8%82%E5%B9%B3%E5%8F%B0/%E5%A4%8D%E5%85%B4%E5%B2%9B%E5%BA%94%E6%80%A5%E6%80%9D%E8%B7%AF-%E9%9C%80%E6%B1%82%E5%88%86%E6%9E%90-%E9%87%8D%E6%9E%84%E7%A8%BF.html">完整需求文档</a>。
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h1 id="pageTitle">虚拟推演教学实验台</h1>
+        <div class="desc" id="pageDesc">教师配置场景与扰动，学生设计 Agent 工作流、知识范围与协作方式。</div>
+      </div>
+      <span class="demo-badge">演示数据 · DEMO</span>
+    </div>
+
+    <div class="content">
+
+      <!-- ================= 01 知识与场景库 ================= -->
+      <section id="tab-library" hidden="">
+        <div class="subtabs" id="libSubtabs">
+          <button data-lib="scene" class="">场景库</button>
+          <button data-lib="plan" class="">预案库</button>
+          <button data-lib="case" class="">案例库</button>
+          <button data-lib="sop" class="active">岗位SOP库</button>
+        </div>
+
+        <div class="lib-toolbar">
+          <input type="text" id="libSearch" placeholder="按标题或编号搜索…">
+          <button class="btn">+ 新建条目</button>
+        </div>
+
+        <div class="lib-list" id="libList"><div class="lib-item"><span class="lib-id mono">SOP-GUIDE-01</span><span class="lib-title">引导员岗位标准操作规程</span><span class="lib-meta">v2 · 已审核</span><span class="lib-tags"><span class="pill good">已审核</span></span></div><div class="lib-item"><span class="lib-id mono">SOP-SEC-01</span><span class="lib-title">安保岗位巡检SOP</span><span class="lib-meta">v1 · 已审核</span><span class="lib-tags"><span class="pill good">已审核</span></span></div><div class="lib-item"><span class="lib-id mono">SOP-DEV-01</span><span class="lib-title">设备保障岗位检修SOP</span><span class="lib-meta">v1 · 候选规则</span><span class="lib-tags"><span class="pill warn">候选</span></span></div></div>
+
+        <div class="note-box">知识片段与对象关系共同检索——每条方案依据都记录文档编号、版本、章节位置和适用场地，检索结果附带可定位来源，而不是一段无出处的摘要。</div>
+      </section>
+
+      <!-- ================= 02 事件与态势工作台 ================= -->
+      <section id="tab-incident" hidden="">
+        <div class="grid-2">
+          <div class="card">
+            <h3>事件录入</h3>
+            <div class="hint">自然语言、表单或人工报告均可，系统先解析对象再识别信息缺口。</div>
+            <div class="field-group">
+              <label class="field">事件描述</label>
+              <textarea id="incidentInput">演出开始30分钟后，东侧主要通道因临时设施故障无法通行，预计20分钟内无法恢复。东侧区域观众较多，现场有4名保安、3名引导员和2名设备保障人员。</textarea>
+            </div>
+            <div class="btn-row">
+              <button class="btn primary" id="btnAnalyze">▶ 态势研判 Agent 解析</button>
+              <button class="btn ghost" id="btnResetIncident">重置</button>
+            </div>
+          </div>
+
+          <div class="card" id="incidentResult">
+            <h3>事件卡 INC-DEMO-01</h3>
+            <div class="hint">对象映射、影响范围与信息缺口——不虚构未测量的数值。</div>
+            <div class="kv-list">
+              <div class="row"><span class="k">匹配对象</span><span class="mono">PASS-E</span>（东侧主通道）<span class="pill accent">已关联</span></div>
+              <div class="row"><span class="k">影响区域</span>ZONE-E，及3个既有依赖任务</div>
+              <div class="row"><span class="k">预计恢复</span>报告中的预计值：20分钟内 <span class="pill warn">待核实</span></div>
+            </div>
+            <h3 style="margin-top:16px;">信息缺口</h3>
+            <div class="chip-row">
+              <span class="chip unknown">东侧区域人数：未知</span>
+              <span class="chip unknown">PASS-N 备用通道核查：已过期</span>
+              <span class="chip unknown">故障修复时长：未知</span>
+            </div>
+            <h3 style="margin-top:16px;">风险建议</h3>
+            <p style="font-size:13px;">建议优先核查 PASS-N 通道当前可通行状态，并确认引导人员在岗情况；在核查结果返回前，不生成正式分流方案。</p>
+            <div class="btn-row">
+              <button class="btn primary" id="btnToPlan">转到方案生成 →</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 03 方案生成与审核 ================= -->
+      <section id="tab-plan" hidden="">
+        <div class="grid-2">
+          <div>
+            <div class="card">
+              <h3>知识依据</h3>
+              <div class="hint">方案编排 Agent 检索到的相关依据，点击可查看原文定位。</div>
+              <div class="chip-row">
+                <span class="chip" title="SOP条目 3.2：通道启用需完成核查并确认引导人员到位">SOP-GUIDE-01 §3.2</span>
+                <span class="chip" title="预案条款 5：分流方案需经现场负责人批准">PLAN-002 §5</span>
+                <span class="chip" title="历史案例：上届活动东侧拥堵处置耗时18分钟">CASE-2025-07</span>
+              </div>
+              <div class="btn-row">
+                <button class="btn primary" id="btnGenPlan">▶ 生成候选方案</button>
+              </div>
+            </div>
+
+            <div class="card" id="planCard">
+              <div class="subtabs" id="planVersionTabs">
+                <button data-v="v1" class="active">V1 · 候选</button>
+                <button data-v="v2">V2 · 局部修订</button>
+              </div>
+
+              <div id="planV1">
+                <div class="plan-doc">
+                  <h4>事件概况</h4>
+                  <p>东侧主通道（PASS-E）临时设施故障，预计20分钟内无法恢复，东侧区域观众密度较高。<span class="cite">依据 INC-DEMO-01</span></p>
+                  <h4>响应目标</h4>
+                  <p>启用北侧备用通道（PASS-N）实现分流，维持东侧区域秩序，直至PASS-E恢复或结案。</p>
+                  <h4>分阶段行动</h4>
+                  <ul>
+                    <li>核查 PASS-N 通行状态，确认引导人员到位 <span class="cite">SOP-GUIDE-01 §3.2</span></li>
+                    <li>东侧区域秩序维护（责任：S1、S2）</li>
+                    <li>北侧通道岗位到位（责任：S3、S4）</li>
+                    <li>北侧引导（责任：<strong>G1</strong>）／东侧引导（责任：<strong>G2</strong>）</li>
+                  </ul>
+                  <h4>资源检查结果</h4>
+                  <p><span class="pill warn">冲突</span> G2 被同时安排至东侧引导与北侧核查候选任务——校验器已定位冲突，需人工确认分工。</p>
+                  <h4>恢复与终止条件</h4>
+                  <p>PASS-E 完成专业复查并经负责人批准恢复开放后，转入结案与复盘。</p>
+                </div>
+              </div>
+
+              <div id="planV2" hidden="">
+                <div class="plan-doc">
+                  <h4>修订说明</h4>
+                  <p><span class="pill accent">V2</span> 解除 G2 重复分配：北侧核查改由 G1 独立完成，G2 专职东侧引导。</p>
+                  <h4>分阶段行动（差异）</h4>
+                  <ul>
+                    <li>核查 PASS-N 通行状态（责任：<strong>G1</strong>）<span class="diff-add">已从"G1、G2"改为仅"G1"</span></li>
+                    <li>东侧引导（责任：<strong>G2</strong>）<span class="diff-del">不再兼任北侧核查</span></li>
+                    <li>其余行动与 V1 一致，已完成的设施检查不重复派发</li>
+                  </ul>
+                  <h4>版本关系</h4>
+                  <p>V2 继承 V1 的对象引用与依据，未受影响任务保留原状态；本次修订仅涉及 2 项任务。</p>
+                </div>
+              </div>
+
+              <div class="note-box">候选方案通过硬约束检查后才能提交人工审批；仍有条件未满足的行动会清楚标注"等待条件"，不会被隐藏。</div>
+
+              <h3 style="margin-top:18px;">人工审核</h3>
+              <div class="field-group">
+                <label class="field">审核意见（可选）</label>
+                <textarea id="reviewNote" placeholder="例如：同意北侧分流方案，要求G1核查完成后立即回传状态"></textarea>
+              </div>
+              <div class="btn-row">
+                <button class="btn primary" id="btnApprove">✓ 批准并派发</button>
+                <button class="btn" id="btnRequestRevise">退回补充信息</button>
+              </div>
+              <div id="approvalState" style="margin-top:12px;" hidden=""></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card">
+              <h3>版本与导出</h3>
+              <div class="kv-list">
+                <div class="row"><span class="k">当前版本</span><span class="mono" id="curVersionLabel">V1</span></div>
+                <div class="row"><span class="k">审核状态</span><span class="pill warn" id="curStatusPill">候选待审</span></div>
+                <div class="row"><span class="k">关联事件</span><span class="mono">INC-DEMO-01</span></div>
+              </div>
+              <div class="btn-row">
+                <button class="btn" id="btnExportWord">导出为 Word 预案</button>
+                <button class="btn" id="btnExportTasks">导出岗位任务清单</button>
+              </div>
+              <div class="hint" style="margin-top:8px;">首期优先完成 Word 导出；PDF 导出列入后续扩展。</div>
+            </div>
+            <div class="card">
+              <h3>依赖任务概览</h3>
+              <div class="timeline">
+                <div class="tl-item"><span class="t mono">T+0</span>核查 PASS-N 通行状态</div>
+                <div class="tl-item"><span class="t mono">T+1</span>东侧区域秩序维护开始</div>
+                <div class="tl-item"><span class="t mono">T+2</span>北侧通道岗位到位（依赖核查通过）</div>
+                <div class="tl-item"><span class="t mono">T+3</span>北侧 / 东侧引导启动（依赖岗位到位）</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 04 本体驱动决策流程 ================= -->
+      <section id="tab-ontology" hidden="">
+        <div class="card">
+          <h3>事件到行动的对象关系</h3>
+          <div class="hint">同一个 PASS-E 编号在地图、事件、任务和审批里指向同一个对象——这是"本体驱动"在界面上的样子，不是抽象说法。</div>
+          <div class="diagram-scroll">
+            <figure class="diagram">
+              <svg viewBox="0 0 920 260" role="img" aria-label="本体驱动决策流程：事件对象PASS-E连接通道核查任务、方案版本、人工审批和执行回执，所有环节引用同一组对象编号，最终状态回写本体并触发复盘">
+                <defs>
+                  <marker id="da" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M0,0 L10,5 L0,10 z" fill="currentColor"></path>
+                  </marker>
+                </defs>
+                <g font-family="Noto Sans SC, sans-serif" font-size="12" text-anchor="middle">
+                  <rect x="10" y="100" width="130" height="60" rx="9" fill="none" stroke="currentColor" stroke-width="1.3"></rect>
+                  <text x="75" y="126" fill="currentColor" font-family="JetBrains Mono, monospace" font-weight="700">INC-DEMO-01</text>
+                  <text x="75" y="144" fill="currentColor">事件对象</text>
+
+                  <rect x="180" y="30" width="130" height="56" rx="9" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.3"></rect>
+                  <text x="245" y="55" fill="currentColor" font-family="JetBrains Mono, monospace" font-weight="700">PASS-E</text>
+                  <text x="245" y="72" fill="currentColor">东侧主通道</text>
+
+                  <rect x="180" y="172" width="130" height="56" rx="9" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.3"></rect>
+                  <text x="245" y="197" fill="currentColor" font-family="JetBrains Mono, monospace" font-weight="700">PASS-N</text>
+                  <text x="245" y="214" fill="currentColor">北侧备用通道</text>
+
+                  <rect x="350" y="172" width="130" height="56" rx="9" fill="none" stroke="currentColor" stroke-width="1.3" stroke-dasharray="3 3"></rect>
+                  <text x="415" y="197" fill="currentColor">核查任务</text>
+                  <text x="415" y="214" fill="currentColor" font-family="JetBrains Mono, monospace" font-size="10.5">TASK-CHK-01</text>
+
+                  <rect x="520" y="100" width="130" height="60" rx="9" fill="none" stroke="currentColor" stroke-width="1.3"></rect>
+                  <text x="585" y="122" fill="currentColor" font-family="JetBrains Mono, monospace" font-weight="700">PLAN-DEMO-01</text>
+                  <text x="585" y="140" fill="currentColor">方案版本 V1</text>
+                  <text x="585" y="155" fill="currentColor" font-size="10.5">目标对象 PASS-N</text>
+
+                  <rect x="690" y="30" width="130" height="56" rx="9" fill="var(--accent-soft)" stroke="var(--accent-strong)" stroke-width="2.2"></rect>
+                  <text x="755" y="52" fill="var(--accent-strong)" font-weight="700">人工审批</text>
+                  <text x="755" y="69" fill="var(--accent-strong)" font-size="10.5">现场负责人</text>
+
+                  <rect x="690" y="172" width="130" height="56" rx="9" fill="none" stroke="currentColor" stroke-width="1.3" stroke-dasharray="3 3"></rect>
+                  <text x="755" y="194" fill="currentColor">执行回执</text>
+                  <text x="755" y="211" fill="currentColor" font-family="JetBrains Mono, monospace" font-size="10.5">G1 / S3 / S4</text>
+                </g>
+                <g stroke="currentColor" stroke-width="1.3" marker-end="url(#da)">
+                  <line x1="140" y1="115" x2="178" y2="70"></line>
+                  <line x1="140" y1="145" x2="178" y2="197"></line>
+                  <line x1="310" y1="197" x2="348" y2="197"></line>
+                  <line x1="480" y1="185" x2="518" y2="140"></line>
+                  <line x1="650" y1="130" x2="688" y2="60"></line>
+                  <line x1="650" y1="140" x2="688" y2="197"></line>
+                </g>
+                <g font-family="JetBrains Mono, monospace" font-size="10" fill="currentColor">
+                  <text x="150" y="90">影响</text>
+                  <text x="325" y="188">核查</text>
+                  <text x="495" y="155">引用对象</text>
+                  <text x="660" y="88">请求批准</text>
+                  <text x="655" y="175">派发</text>
+                </g>
+              </svg>
+              <figcaption>方框内的编号（PASS-E / PASS-N / PLAN-DEMO-01）在事件卡、方案文档、审批记录里完全一致，点击任意入口都能追到同一个对象。</figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>当前对象状态面板</h3>
+          <div class="hint">点击对象查看关联事件、任务与证据时效——这是本体在界面上的直接呈现，而非隐藏在后台的数据结构。</div>
+          <div class="obj-grid" id="objGrid"><div class="obj-card"><div class="obj-id mono">PASS-E</div><div class="obj-name">东侧主通道</div><span class="pill warn">不可通行</span></div><div class="obj-card"><div class="obj-id mono">PASS-N</div><div class="obj-name">北侧备用通道</div><span class="pill warn">核查中</span></div><div class="obj-card"><div class="obj-id mono">ZONE-E</div><div class="obj-name">东侧区域</div><span class="pill neutral">人数未知</span></div><div class="obj-card"><div class="obj-id mono">G1</div><div class="obj-name">引导员</div><span class="pill good">可调用</span></div><div class="obj-card"><div class="obj-id mono">G2</div><div class="obj-name">引导员</div><span class="pill warn">分配冲突</span></div><div class="obj-card"><div class="obj-id mono">G3</div><div class="obj-name">引导员</div><span class="pill neutral">原岗保留</span></div><div class="obj-card"><div class="obj-id mono">S1–S4</div><div class="obj-name">保安</div><span class="pill good">在岗</span></div><div class="obj-card"><div class="obj-id mono">E1–E2</div><div class="obj-name">设备保障</div><span class="pill warn">核查中</span></div></div>
+        </div>
+      </section>
+
+      <!-- ================= 05 教学实验台 ================= -->
+      <section id="tab-teaching">
+        <div class="grid-2">
+          <div>
+            <div class="card">
+              <h3>教师：实验场景配置</h3>
+              <div class="field-group">
+                <label class="field">场景模板</label>
+                <select><option>东侧通道故障与动态分流（主场景）</option><option>舞台及临建设施隐患闭环（扩展场景）</option></select>
+              </div>
+              <div class="field-group">
+                <label class="field">知识版本</label>
+                <select><option>RULE-DEMO v3（当前发布版本）</option><option>RULE-DEMO v2（历史版本，仅回放）</option></select>
+              </div>
+              <h3 style="margin-top:16px;">扰动脚本</h3>
+              <div class="toggle-row">
+                <div><div class="lbl">降低模拟人员服从率</div><div class="sub">测试引导任务是否被正确标记为受阻</div></div>
+                <label class="switch"><input type="checkbox" checked=""><span class="track"></span></label>
+              </div>
+              <div class="toggle-row">
+                <div><div class="lbl">注入北侧通道临时受阻</div><div class="sub">触发效果偏差，验证自动重新研判（AC13）</div></div>
+                <label class="switch"><input type="checkbox"><span class="track"></span></label>
+              </div>
+              <div class="toggle-row">
+                <div><div class="lbl">报告延迟到达</div><div class="sub">验证证据时序处理（AC03）</div></div>
+                <label class="switch"><input type="checkbox"><span class="track"></span></label>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>学生：Agent 工作流设计</h3>
+              <div class="hint">按需启用职责，不要求为每个环节都配一个 Agent。</div>
+              <div class="toggle-row"><div><div class="lbl">态势研判 Agent</div><div class="sub">对象解析、影响分析、信息缺口</div></div><label class="switch"><input type="checkbox" checked=""><span class="track"></span></label></div>
+              <div class="toggle-row"><div><div class="lbl">方案编排 Agent</div><div class="sub">检索依据、编排任务、生成候选方案</div></div><label class="switch"><input type="checkbox" checked=""><span class="track"></span></label></div>
+              <div class="toggle-row"><div><div class="lbl">方案审查 Agent</div><div class="sub">检查依据适用性与异常分支（最小闭环阶段可不启用）</div></div><label class="switch"><input type="checkbox"><span class="track"></span></label></div>
+              <div class="toggle-row"><div><div class="lbl">复盘与教学助理 Agent</div><div class="sub">整理时间线、生成候选经验</div></div><label class="switch"><input type="checkbox"><span class="track"></span></label></div>
+
+              <h3 style="margin-top:16px;">知识范围</h3>
+              <div class="chip-row">
+                <span class="chip">场景库</span><span class="chip">预案库</span><span class="chip">案例库</span><span class="chip">岗位SOP库</span>
+              </div>
+
+              <div class="btn-row">
+                <button class="btn primary" id="btnRunExp">▶ 运行实验</button>
+                <button class="btn" id="btnGenReport">生成实验报告</button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="card" id="runLogCard" hidden="">
+              <h3>运行记录 · RUN-STU07-03</h3>
+              <div class="timeline" id="runLog"></div>
+            </div>
+
+            <div class="card" id="reportCard" hidden="">
+              <h3>实验报告 · 量化评价</h3>
+              <div class="metric-grid">
+                <div class="metric"><div class="val">92%</div><div class="lbl">应急响应任务类型覆盖率</div></div>
+                <div class="metric"><div class="val">1</div><div class="lbl">资源冲突检出数</div></div>
+                <div class="metric"><div class="val">4m12s</div><div class="lbl">响应与调整耗时</div></div>
+                <div class="metric"><div class="val">已确认</div><div class="lbl">效果达成情况</div></div>
+              </div>
+              <div class="note-box">越权执行等硬性失败单列，不与其他高分抵消；本报告提供证据，教师保留终评权。</div>
+              <div class="btn-row">
+                <button class="btn" id="btnExportReport">导出实验报告</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast">G3：详情面板（演示未展开）</div>
+
+<script>
+(function () {
+  // ---------- module switching ----------
+  var titles = {
+    library: ["知识与场景库", "场景库、预案库、案例库、岗位SOP库——四库统一检索，支撑事件理解与预案生成。"],
+    incident: ["事件与态势工作台", "自然语言/表单录入事件，态势研判 Agent 解析对象、影响范围与信息缺口。"],
+    plan: ["方案生成与审核", "方案编排 Agent 生成结构化候选方案，人工审核后绑定具体版本派发。"],
+    ontology: ["本体驱动决策流程", "同一组对象编号贯穿事件、任务、方案与审批，而不是各页面各自的文本描述。"],
+    teaching: ["虚拟推演教学实验台", "教师配置场景与扰动，学生设计 Agent 工作流、知识范围与协作方式。"]
+  };
+  var navButtons = Array.prototype.slice.call(document.querySelectorAll("#moduleNav button"));
+  navButtons.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      navButtons.forEach(function (b) { b.classList.remove("active"); });
+      btn.classList.add("active");
+      var tab = btn.getAttribute("data-tab");
+      ["library","incident","plan","ontology","teaching"].forEach(function (t) {
+        document.getElementById("tab-" + t).hidden = (t !== tab);
+      });
+      document.getElementById("pageTitle").textContent = titles[tab][0];
+      document.getElementById("pageDesc").textContent = titles[tab][1];
+      window.scrollTo(0, 0);
+    });
+  });
+
+  function goTo(tab) {
+    var btn = navButtons.filter(function (b) { return b.getAttribute("data-tab") === tab; })[0];
+    if (btn) btn.click();
+  }
+
+  function showToast(msg) {
+    var t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(showToast._h);
+    showToast._h = setTimeout(function () { t.classList.remove("show"); }, 2200);
+  }
+
+  // ---------- 01 library ----------
+  var LIB_DATA = {
+    scene: [
+      { id: "SCENE-001", title: "大型音乐节（复兴岛船台公园）", meta: "更新 2026-08-12", tags: ["已发布"] },
+      { id: "SCENE-002", title: "校园大型运动会", meta: "更新 2026-07-30", tags: ["草稿"] },
+      { id: "SCENE-003", title: "文旅市集类活动", meta: "更新 2026-06-18", tags: ["已发布"] }
+    ],
+    plan: [
+      { id: "PLAN-DEMO-01", title: "东侧通道故障动态分流预案", meta: "V1 · 候选中", tags: ["候选"] },
+      { id: "PLAN-002", title: "极端天气应急预案", meta: "V3 · 已发布", tags: ["已发布"] },
+      { id: "PLAN-003", title: "大型舞台坍塌应急预案", meta: "V1 · 待审核", tags: ["待审核"] }
+    ],
+    case: [
+      { id: "CASE-2025-07", title: "上届音乐节东侧拥堵处置复盘", meta: "归档 2025-09", tags: ["已归档"] },
+      { id: "CASE-2025-11", title: "设备保障人员缺岗处置案例", meta: "归档 2025-11", tags: ["已归档"] }
+    ],
+    sop: [
+      { id: "SOP-GUIDE-01", title: "引导员岗位标准操作规程", meta: "v2 · 已审核", tags: ["已审核"] },
+      { id: "SOP-SEC-01", title: "安保岗位巡检SOP", meta: "v1 · 已审核", tags: ["已审核"] },
+      { id: "SOP-DEV-01", title: "设备保障岗位检修SOP", meta: "v1 · 候选规则", tags: ["候选"] }
+    ]
+  };
+  var curLib = "scene";
+  function renderLib() {
+    var q = document.getElementById("libSearch").value.trim();
+    var list = LIB_DATA[curLib].filter(function (it) {
+      return !q || it.title.indexOf(q) > -1 || it.id.indexOf(q) > -1;
+    });
+    var el = document.getElementById("libList");
+    el.innerHTML = "";
+    if (!list.length) {
+      el.innerHTML = '<div class="hint">没有匹配的条目。</div>';
+      return;
+    }
+    list.forEach(function (it) {
+      var row = document.createElement("div");
+      row.className = "lib-item";
+      var pillClass = it.tags[0] === "已发布" || it.tags[0] === "已审核" ? "good" : (it.tags[0] === "待审核" || it.tags[0] === "候选" ? "warn" : "neutral");
+      row.innerHTML =
+        '<span class="lib-id mono">' + it.id + '</span>' +
+        '<span class="lib-title">' + it.title + '</span>' +
+        '<span class="lib-meta">' + it.meta + '</span>' +
+        '<span class="lib-tags"><span class="pill ' + pillClass + '">' + it.tags[0] + '</span></span>';
+      el.appendChild(row);
+    });
+  }
+  Array.prototype.slice.call(document.querySelectorAll("#libSubtabs button")).forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.querySelectorAll("#libSubtabs button").forEach(function (x) { x.classList.remove("active"); });
+      b.classList.add("active");
+      curLib = b.getAttribute("data-lib");
+      renderLib();
+    });
+  });
+  document.getElementById("libSearch").addEventListener("input", renderLib);
+  renderLib();
+
+  // ---------- 02 incident ----------
+  document.getElementById("btnAnalyze").addEventListener("click", function () {
+    document.getElementById("incidentResult").hidden = false;
+    showToast("态势研判 Agent 已完成对象解析");
+  });
+  document.getElementById("btnResetIncident").addEventListener("click", function () {
+    document.getElementById("incidentResult").hidden = true;
+  });
+  document.getElementById("btnToPlan").addEventListener("click", function () { goTo("plan"); });
+
+  // ---------- 03 plan ----------
+  document.getElementById("btnGenPlan").addEventListener("click", function () {
+    document.getElementById("planCard").hidden = false;
+    document.getElementById("curStatusPill").textContent = "候选待审";
+    document.getElementById("curStatusPill").className = "pill warn";
+    showToast("方案编排 Agent 已生成候选方案 V1");
+  });
+  Array.prototype.slice.call(document.querySelectorAll("#planVersionTabs button")).forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.querySelectorAll("#planVersionTabs button").forEach(function (x) { x.classList.remove("active"); });
+      b.classList.add("active");
+      var v = b.getAttribute("data-v");
+      document.getElementById("planV1").hidden = (v !== "v1");
+      document.getElementById("planV2").hidden = (v !== "v2");
+      document.getElementById("curVersionLabel").textContent = v.toUpperCase();
+    });
+  });
+  document.getElementById("btnApprove").addEventListener("click", function () {
+    var st = document.getElementById("approvalState");
+    st.hidden = false;
+    st.innerHTML = '<span class="pill good">已批准并派发</span> <span class="hint">批准绑定当前版本、动作范围与批准人，网关将在提交时重新核查前置条件。</span>';
+    document.getElementById("curStatusPill").textContent = "已批准";
+    document.getElementById("curStatusPill").className = "pill good";
+    showToast("方案已批准，任务卡已生成");
+  });
+  document.getElementById("btnRequestRevise").addEventListener("click", function () {
+    var st = document.getElementById("approvalState");
+    st.hidden = false;
+    st.innerHTML = '<span class="pill warn">已退回，等待补充信息</span> <span class="hint">已记录审核意见，方案回到候选状态。</span>';
+    document.getElementById("curStatusPill").textContent = "待补充";
+    document.getElementById("curStatusPill").className = "pill warn";
+  });
+  document.getElementById("btnExportWord").addEventListener("click", function () { showToast("已生成 Word 预案（演示模式，不产生真实下载）"); });
+  document.getElementById("btnExportTasks").addEventListener("click", function () { showToast("已导出岗位任务清单（演示模式）"); });
+
+  // ---------- 04 ontology objects ----------
+  var OBJS = [
+    { id: "PASS-E", name: "东侧主通道", status: "不可通行", pill: "warn" },
+    { id: "PASS-N", name: "北侧备用通道", status: "核查中", pill: "warn" },
+    { id: "ZONE-E", name: "东侧区域", status: "人数未知", pill: "neutral" },
+    { id: "G1", name: "引导员", status: "可调用", pill: "good" },
+    { id: "G2", name: "引导员", status: "分配冲突", pill: "warn" },
+    { id: "G3", name: "引导员", status: "原岗保留", pill: "neutral" },
+    { id: "S1–S4", name: "保安", status: "在岗", pill: "good" },
+    { id: "E1–E2", name: "设备保障", status: "核查中", pill: "warn" }
+  ];
+  var objGrid = document.getElementById("objGrid");
+  OBJS.forEach(function (o) {
+    var d = document.createElement("div");
+    d.className = "obj-card";
+    d.innerHTML = '<div class="obj-id mono">' + o.id + '</div><div class="obj-name">' + o.name + '</div><span class="pill ' + o.pill + '">' + o.status + '</span>';
+    d.addEventListener("click", function () { showToast(o.id + "：详情面板（演示未展开）"); });
+    objGrid.appendChild(d);
+  });
+
+  // ---------- 05 teaching ----------
+  document.getElementById("btnRunExp").addEventListener("click", function () {
+    document.getElementById("runLogCard").hidden = false;
+    document.getElementById("runLog").innerHTML = [
+      ["00:00", "事件注入：东侧通道故障"],
+      ["00:04", "态势研判 Agent：完成对象解析，列出3项信息缺口"],
+      ["00:09", "方案编排 Agent：检索依据，生成候选方案 V1"],
+      ["00:11", "资源检查：发现 G2 分配冲突"],
+      ["00:15", "扰动触发：模拟人员服从率下降"],
+      ["00:16", "等待人工确认…"]
+    ].map(function (r) { return '<div class="tl-item"><span class="t mono">' + r[0] + '</span>' + r[1] + '</div>'; }).join("");
+    showToast("实验运行完成，等待人工确认节点");
+  });
+  document.getElementById("btnGenReport").addEventListener("click", function () {
+    document.getElementById("reportCard").hidden = false;
+    showToast("已生成实验报告");
+  });
+  document.getElementById("btnExportReport").addEventListener("click", function () { showToast("已导出实验报告（演示模式）"); });
+})();
+</script>
+</body></html>

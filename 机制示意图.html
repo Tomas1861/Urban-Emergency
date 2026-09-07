@@ -1,0 +1,288 @@
+<meta charset="utf-8">
+<title>三个机制示意图</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Noto+Sans+SC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #F3EEE3; --surface: #FFFFFF; --surface-alt: #EAE2D0;
+    --ink: #1E2A2E; --ink-muted: #5C6B70;
+    --accent: #1F6E7A; --accent-strong: #123F47; --accent-soft: #D7E7E4;
+    --warn: #A85A18; --warn-soft: #F1DFC5;
+    --line: rgba(30, 42, 46, 0.15); --line-strong: rgba(30, 42, 46, 0.28);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #11181A; --surface: #1A2325; --surface-alt: #202B2C;
+      --ink: #E9EEEA; --ink-muted: #9BA9A8;
+      --accent: #63BCC5; --accent-strong: #96D6DC; --accent-soft: rgba(99,188,197,0.14);
+      --warn: #E3A25C; --warn-soft: rgba(227,162,92,0.14);
+      --line: rgba(233,238,234,0.14); --line-strong: rgba(233,238,234,0.26);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #11181A; --surface: #1A2325; --surface-alt: #202B2C;
+    --ink: #E9EEEA; --ink-muted: #9BA9A8;
+    --accent: #63BCC5; --accent-strong: #96D6DC; --accent-soft: rgba(99,188,197,0.14);
+    --warn: #E3A25C; --warn-soft: rgba(227,162,92,0.14);
+    --line: rgba(233,238,234,0.14); --line-strong: rgba(233,238,234,0.26);
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    line-height: 1.72; -webkit-font-smoothing: antialiased;
+    max-width: 100%; overflow-x: hidden;
+  }
+  h1, h2 { font-family: "Noto Serif SC", "Songti SC", serif; font-weight: 800; text-wrap: balance; }
+  .mono, code { font-family: "JetBrains Mono", ui-monospace, monospace; }
+  code { background: var(--surface-alt); padding: 1px 5px; border-radius: 4px; font-size: 0.88em; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 0 24px; }
+
+  header.hero { padding: 56px 0 32px; border-bottom: 1px solid var(--line); }
+  .eyebrow {
+    font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
+  }
+  header.hero h1 { font-size: clamp(24px, 3.6vw, 32px); line-height: 1.35; margin: 0 0 16px; }
+  header.hero p { font-size: 15px; color: var(--ink-muted); max-width: 700px; margin: 0; }
+
+  section.diag { padding: 44px 0; border-bottom: 1px solid var(--line); }
+  section.diag:last-of-type { border-bottom: none; }
+  .diag-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 6px; }
+  .diag-num {
+    font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--accent);
+    border: 1px solid var(--line-strong); border-radius: 999px; padding: 3px 10px; flex: none;
+  }
+  h2 { font-size: 19px; margin: 0; }
+  .diag-lede { color: var(--ink-muted); font-size: 13.5px; margin: 8px 0 20px; max-width: 700px; }
+
+  .diagram-scroll { overflow-x: auto; }
+  figure.diagram {
+    margin: 0; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 14px; padding: 20px 10px 8px; color: var(--ink);
+  }
+  figure.diagram svg { display: block; width: 100%; height: auto; overflow: visible; }
+  figure.diagram figcaption {
+    font-size: 13px; color: var(--ink-muted); text-align: center; padding: 14px 18px 4px;
+  }
+
+  .honest-note {
+    margin-top: 10px; font-size: 11.5px; color: var(--ink-muted);
+    background: var(--surface-alt); border-radius: 8px; padding: 8px 14px;
+    font-family: "JetBrains Mono", monospace; letter-spacing: 0.01em; line-height: 1.6;
+  }
+  .honest-note b { color: var(--warn); font-weight: 700; }
+
+  .dg-box { fill: var(--surface); stroke: currentColor; stroke-width: 1.3; }
+  .dg-device { stroke-dasharray: 3 3; }
+  .dg-human { fill: var(--accent-soft); stroke: var(--accent-strong); stroke-width: 2.2; }
+  .dg-catalog { fill: var(--surface-alt); stroke: currentColor; stroke-width: 1.2; stroke-dasharray: 2 3; }
+  .dg-core { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.6; }
+  .dg-warn { fill: var(--warn-soft); stroke: var(--warn); stroke-width: 1.4; }
+  .dg-neutral { fill: var(--surface-alt); stroke: var(--ink-muted); stroke-dasharray: 3 3; }
+  .dg-tag { font-family: "JetBrains Mono", monospace; font-size: 10.2px; fill: var(--ink-muted); }
+  .dg-label { font-family: "Noto Sans SC", sans-serif; font-size: 12.4px; fill: currentColor; }
+  .dg-human-tag { fill: var(--accent-strong); font-weight: 700; }
+  .dg-human-label { fill: var(--accent-strong); font-weight: 600; }
+  .dg-branch { font-family: "JetBrains Mono", monospace; font-size: 10.5px; fill: var(--ink-muted); }
+  .dg-diamond-label { font-family: "Noto Sans SC", sans-serif; font-size: 12.5px; fill: currentColor; font-weight: 600; }
+  .dg-arrow { stroke: currentColor; stroke-width: 1.3; fill: none; }
+
+  footer { padding: 36px 24px 60px; text-align: center; color: var(--ink-muted); font-size: 12.5px; }
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">演安智策 · 机制示意图</div>
+    <h1>我们自己的三张机制图——用自己的场景，不用比赛拿分的视觉包装</h1>
+    <p>对应《参考架构分析与优化建议.md》里提炼出的三个机制：Agent 按任务动态组装、行动执行的临时凭证收放、经验从候选到可撤销的完整生命周期。全部用"东侧通道故障"这一个我们已经在用的场景画，不是抽象举例。</p>
+  </header>
+
+  <section class="diag">
+    <div class="diag-head"><span class="diag-num">01</span><h2>Agent 不是写死的类，是按任务从共享目录里组装出来的</h2></div>
+    <p class="diag-lede">同一份"上下文/知识范围/工具/模型/权限"目录，服务不同事件时组装出不同的执行体；任务结束即解散，不保留运行状态。</p>
+    <div class="diagram-scroll">
+      <figure class="diagram">
+        <svg viewBox="0 0 760 400" role="img" aria-label="Agent按任务组装机制：上下文、知识范围、工具清单、模型版本、权限与完成条件五个共享目录组件向上组装成本次执行体，执行体产出结构化方案建议，任务结束后执行体解散不复用运行状态">
+          <defs>
+            <marker id="m1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="currentColor"></path>
+            </marker>
+          </defs>
+
+          <!-- output box -->
+          <rect class="dg-box" x="230" y="26" width="300" height="64" rx="10"></rect>
+          <text x="380" y="52" text-anchor="middle" class="dg-tag">输出</text>
+          <text x="380" y="72" text-anchor="middle" class="dg-label">结构化方案建议（含依据、待核问题）</text>
+
+          <path class="dg-arrow" marker-end="url(#m1)" d="M380,160 L380,92"></path>
+
+          <!-- core instance -->
+          <rect class="dg-core" x="200" y="162" width="360" height="76" rx="12"></rect>
+          <text x="380" y="188" text-anchor="middle" class="dg-tag" style="fill:var(--accent-strong);font-weight:700;">本次执行体</text>
+          <text x="380" y="208" text-anchor="middle" class="dg-label">态势研判 + 方案编排 · 服务 INC-DEMO-01</text>
+          <text x="380" y="225" text-anchor="middle" class="dg-tag">任务结束即解散 · 配置留痕，不复用运行状态</text>
+
+          <!-- converging arrows from catalog -->
+          <g class="dg-arrow" marker-end="url(#m1)">
+            <path d="M100,320 C100,280 250,260 330,240"></path>
+            <path d="M240,320 C240,290 300,270 350,240"></path>
+            <path d="M380,320 L380,240"></path>
+            <path d="M520,320 C520,290 460,270 410,240"></path>
+            <path d="M660,320 C660,280 470,260 430,240"></path>
+          </g>
+
+          <!-- catalog row -->
+          <g font-family="Noto Sans SC, sans-serif" font-size="12" text-anchor="middle">
+            <rect class="dg-catalog" x="35" y="322" width="130" height="60" rx="8"></rect>
+            <text x="100" y="348" fill="currentColor">上下文</text>
+            <text x="100" y="365" class="dg-tag">事件与对象状态</text>
+
+            <rect class="dg-catalog" x="175" y="322" width="130" height="60" rx="8"></rect>
+            <text x="240" y="348" fill="currentColor">知识范围</text>
+            <text x="240" y="365" class="dg-tag">检索与引用边界</text>
+
+            <rect class="dg-catalog" x="315" y="322" width="130" height="60" rx="8"></rect>
+            <text x="380" y="348" fill="currentColor">工具清单</text>
+            <text x="380" y="365" class="dg-tag">check_routes等</text>
+
+            <rect class="dg-catalog" x="455" y="322" width="130" height="60" rx="8"></rect>
+            <text x="520" y="348" fill="currentColor">模型版本</text>
+            <text x="520" y="365" class="dg-tag">可替换、可回滚</text>
+
+            <rect class="dg-catalog" x="595" y="322" width="130" height="60" rx="8"></rect>
+            <text x="660" y="348" fill="currentColor">权限与条件</text>
+            <text x="660" y="365" class="dg-tag">完成/失败标准</text>
+          </g>
+          <text x="380" y="300" text-anchor="middle" class="dg-tag">共享目录 · 换场景只改配置，不新写 Agent 类</text>
+        </svg>
+        <figcaption>虚线框是共享目录里现成的组件，中间的实心框是"这一次"临时拼出来的执行体——换成设施隐患场景，只需要换目录里的配置，不用重新写一个 Agent。</figcaption>
+      </figure>
+    </div>
+    <div class="honest-note"><b>机制示意</b> ｜ 已验证范围：四类 Agent 职责划分已写入需求重构稿7.1节并在 backend/app/agents/ 分文件实现 ｜ 待验证部分：本图所示的"配置驱动组装"尚未落地，现有代码是否已按此方式组织需团队核实，复用/维护成本的降低效果需实现后观察</div>
+  </section>
+
+  <section class="diag">
+    <div class="diag-head"><span class="diag-num">02</span><h2>批准之后，权限是借出去的，不是发出去的</h2></div>
+    <p class="diag-lede">方案批准不等于永久授权——行动网关签发一张限定动作范围、有过期时间的临时凭证，执行完或超时，权限自动收回。</p>
+    <div class="diagram-scroll">
+      <figure class="diagram">
+        <svg viewBox="0 0 620 600" role="img" aria-label="临时凭证机制：方案批准后行动网关签发限定范围与过期时间的临时执行凭证，凭证驱动派发任务，若在有效期内完成则登记回执并正常收回权限，若超时则凭证失效动作自动阻断需重新申请批准，最终结果回写共享底座">
+          <defs>
+            <marker id="m2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="currentColor"></path>
+            </marker>
+          </defs>
+
+          <rect class="dg-box" x="70" y="20" width="260" height="60" rx="9"></rect>
+          <text x="200" y="44" text-anchor="middle" class="dg-tag">系统</text>
+          <text x="200" y="62" text-anchor="middle" class="dg-label">方案已批准（绑定具体版本）</text>
+          <path class="dg-arrow" marker-end="url(#m2)" d="M200,80 L200,108"></path>
+
+          <rect class="dg-human" x="70" y="110" width="260" height="76" rx="10"></rect>
+          <text x="200" y="134" text-anchor="middle" class="dg-tag dg-human-tag">行动网关</text>
+          <text x="200" y="154" text-anchor="middle" class="dg-label dg-human-label">签发临时执行凭证</text>
+          <text x="200" y="172" text-anchor="middle" class="dg-tag">限定动作范围 ＋ 过期时间</text>
+          <path class="dg-arrow" marker-end="url(#m2)" d="M200,186 L200,214"></path>
+
+          <rect class="dg-box dg-device" x="70" y="216" width="260" height="60" rx="9"></rect>
+          <text x="200" y="240" text-anchor="middle" class="dg-tag">执行端</text>
+          <text x="200" y="258" text-anchor="middle" class="dg-label">凭证驱动派发任务</text>
+          <path class="dg-arrow" marker-end="url(#m2)" d="M200,276 L200,304"></path>
+
+          <polygon class="dg-box" points="200,306 310,356 200,406 90,356"></polygon>
+          <text x="200" y="352" text-anchor="middle" class="dg-diamond-label">有效期内</text>
+          <text x="200" y="368" text-anchor="middle" class="dg-diamond-label">完成？</text>
+          <path class="dg-arrow" marker-end="url(#m2)" d="M200,406 L200,434"></path>
+          <text x="215" y="424" class="dg-branch">是</text>
+          <path class="dg-arrow" marker-end="url(#m2)" d="M310,356 L378,356"></path>
+          <text x="316" y="348" class="dg-branch">否 · 超时</text>
+
+          <rect class="dg-warn" x="380" y="322" width="200" height="68" rx="9"></rect>
+          <text x="480" y="344" text-anchor="middle" class="dg-tag">凭证失效</text>
+          <text x="480" y="364" text-anchor="middle" class="dg-label">动作自动阻断</text>
+          <text x="480" y="380" text-anchor="middle" class="dg-tag">需重新申请批准（结束）</text>
+
+          <rect class="dg-box" x="70" y="436" width="260" height="60" rx="9"></rect>
+          <text x="200" y="460" text-anchor="middle" class="dg-tag">系统</text>
+          <text x="200" y="478" text-anchor="middle" class="dg-label">登记执行回执，凭证正常失效</text>
+          <path class="dg-arrow" marker-end="url(#m2)" d="M200,496 L200,524"></path>
+
+          <rect class="dg-core" x="70" y="526" width="260" height="60" rx="9"></rect>
+          <text x="200" y="550" text-anchor="middle" class="dg-tag" style="fill:var(--accent-strong);font-weight:700;">共享底座</text>
+          <text x="200" y="568" text-anchor="middle" class="dg-label">结果回写，权限收回</text>
+        </svg>
+        <figcaption>凭证只在一次任务里有效——完成了就正常收回，超时也会自动失效，不会变成"批过一次就一直能用"的常驻权限。</figcaption>
+      </figure>
+    </div>
+    <div class="honest-note"><b>机制示意</b> ｜ 已验证范围：审批绑定版本、执行时重新核查前置条件已写入需求重构稿6.5节 ｜ 待验证部分：本图的"临时凭证"是具体实现建议，尚未写入代码，需成员A在补充行动网关时一并实现（对应AC07/AC08验收用例）</div>
+  </section>
+
+  <section class="diag">
+    <div class="diag-head"><span class="diag-num">03</span><h2>这次的发现，怎么变成下次能放心用的经验</h2></div>
+    <p class="diag-lede">候选经验不是审完就一劳永逸——发布前多一道模拟验证，发布后仍然可以撤销，撤销不改写已经用过它的历史记录。</p>
+    <div class="diagram-scroll">
+      <figure class="diagram">
+        <svg viewBox="0 0 900 260" role="img" aria-label="经验生命周期：本次任务结果与依据提炼为候选经验，经受控模拟验证后由人工发布为可撤销的可用经验，供下次任务复用；模拟验证未通过则保留为候选不发布；已发布经验被撤销后新任务不再选用但历史引用记录保持原样">
+          <defs>
+            <marker id="m3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="currentColor"></path>
+            </marker>
+          </defs>
+
+          <g font-family="Noto Sans SC, sans-serif" font-size="12" text-anchor="middle">
+            <rect class="dg-box" x="40" y="60" width="130" height="60" rx="8"></rect>
+            <text x="105" y="82" fill="currentColor">本次任务</text>
+            <text x="105" y="98" fill="currentColor">结果与依据</text>
+
+            <rect class="dg-box dg-device" x="185" y="60" width="130" height="60" rx="8"></rect>
+            <text x="250" y="82" fill="currentColor">提炼候选经验</text>
+            <text x="250" y="98" class="dg-tag">候选 · 未发布</text>
+
+            <rect class="dg-box" x="330" y="60" width="130" height="60" rx="8"></rect>
+            <text x="395" y="82" fill="currentColor">受控模拟验证</text>
+            <text x="395" y="98" class="dg-tag">回放历史/构造场景</text>
+
+            <rect class="dg-human" x="475" y="60" width="130" height="60" rx="8"></rect>
+            <text x="540" y="82" fill="var(--accent-strong)" font-weight="700">人工发布</text>
+            <text x="540" y="98" class="dg-tag dg-human-tag">必须人确认</text>
+
+            <rect class="dg-core" x="620" y="60" width="130" height="60" rx="8"></rect>
+            <text x="685" y="82" fill="currentColor">可用经验</text>
+            <text x="685" y="98" class="dg-tag">支持撤销</text>
+
+            <rect class="dg-box dg-device" x="765" y="60" width="130" height="60" rx="8"></rect>
+            <text x="830" y="82" fill="currentColor">下次任务</text>
+            <text x="830" y="98" fill="currentColor">按需复用</text>
+          </g>
+
+          <g class="dg-arrow" marker-end="url(#m3)">
+            <line x1="170" y1="90" x2="183" y2="90"></line>
+            <line x1="315" y1="90" x2="328" y2="90"></line>
+            <line x1="460" y1="90" x2="473" y2="90"></line>
+            <line x1="605" y1="90" x2="618" y2="90"></line>
+            <line x1="750" y1="90" x2="763" y2="90"></line>
+          </g>
+
+          <path class="dg-arrow" marker-end="url(#m3)" d="M395,120 L395,178"></path>
+          <text x="410" y="150" class="dg-branch">未通过</text>
+          <rect class="dg-neutral" x="295" y="180" width="200" height="60" rx="8"></rect>
+          <text x="395" y="203" text-anchor="middle" class="dg-label">保留为候选，不发布</text>
+          <text x="395" y="221" text-anchor="middle" class="dg-tag">可重新提交验证</text>
+
+          <path class="dg-arrow" marker-end="url(#m3)" d="M685,120 L685,178"></path>
+          <text x="705" y="150" class="dg-branch">撤销</text>
+          <rect class="dg-warn" x="590" y="180" width="230" height="60" rx="8"></rect>
+          <text x="705" y="203" text-anchor="middle" class="dg-label">新任务不再选用</text>
+          <text x="705" y="221" text-anchor="middle" class="dg-tag">撤销前已生成的方案/复盘保持原样</text>
+        </svg>
+        <figcaption>横向主线是"从这次经验到下次复用"的正常路径；两条向下的分支是异常出口——模拟没通过就退回候选，撤销也不会动已经发生过的历史。</figcaption>
+      </figure>
+    </div>
+    <div class="honest-note"><b>机制示意</b> ｜ 已验证范围：候选经验需人工审核后发布、区分事实/假设已写入需求重构稿8.5节 ｜ 待验证部分：本图的"受控模拟验证"与"可撤销且不改写历史"已于2026-09-07补进5.2/8.5节文字，尚未落地到知识库表结构（需加 revoked_at 等字段）和界面，效果待成员B/C实现后检验</div>
+  </section>
+
+  <footer>演安智策 · 机制示意图 · 配合《参考架构分析与优化建议.md》一起看</footer>
+</div>

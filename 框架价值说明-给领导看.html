@@ -1,0 +1,217 @@
+<meta charset="utf-8">
+<title>一个通道引出的五个例子</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Noto+Sans+SC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #F3EEE3; --surface: #FFFFFF; --surface-alt: #EAE2D0;
+    --ink: #1E2A2E; --ink-muted: #5C6B70;
+    --accent: #1F6E7A; --accent-strong: #123F47; --accent-soft: #D7E7E4;
+    --old: #A85A18; --old-soft: #F1DFC5;
+    --line: rgba(30, 42, 46, 0.15); --line-strong: rgba(30, 42, 46, 0.28);
+    --shadow: 0 1px 2px rgba(20,30,33,.06), 0 10px 26px -16px rgba(20,30,33,.22);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #11181A; --surface: #1A2325; --surface-alt: #202B2C;
+      --ink: #E9EEEA; --ink-muted: #9BA9A8;
+      --accent: #63BCC5; --accent-strong: #96D6DC; --accent-soft: rgba(99,188,197,0.14);
+      --old: #E3A25C; --old-soft: rgba(227,162,92,0.14);
+      --line: rgba(233,238,234,0.14); --line-strong: rgba(233,238,234,0.26);
+      --shadow: 0 1px 2px rgba(0,0,0,.35), 0 10px 26px -16px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #11181A; --surface: #1A2325; --surface-alt: #202B2C;
+    --ink: #E9EEEA; --ink-muted: #9BA9A8;
+    --accent: #63BCC5; --accent-strong: #96D6DC; --accent-soft: rgba(99,188,197,0.14);
+    --old: #E3A25C; --old-soft: rgba(227,162,92,0.14);
+    --line: rgba(233,238,234,0.14); --line-strong: rgba(233,238,234,0.26);
+    --shadow: 0 1px 2px rgba(0,0,0,.35), 0 10px 26px -16px rgba(0,0,0,.6);
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    line-height: 1.7; -webkit-font-smoothing: antialiased;
+    max-width: 100%; overflow-x: hidden;
+  }
+  h1, h2, h3 { font-family: "Noto Serif SC", "Songti SC", serif; font-weight: 800; text-wrap: balance; }
+  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+  a { color: var(--accent); }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+
+  header.hero { padding: 60px 0 36px; border-bottom: 1px solid var(--line); }
+  .eyebrow {
+    font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 16px;
+  }
+  header.hero h1 { font-size: clamp(27px, 4.2vw, 38px); line-height: 1.32; margin: 0 0 18px; }
+  header.hero p { font-size: 16px; color: var(--ink-muted); max-width: 680px; margin: 0 0 22px; }
+  .scenario-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 18px 22px; font-size: 14px; box-shadow: var(--shadow);
+  }
+  .scenario-card b { color: var(--accent-strong); }
+
+  section.ex { padding: 46px 0; border-bottom: 1px solid var(--line); }
+  section.ex:last-of-type { border-bottom: none; }
+  .ex-head { display: flex; align-items: center; gap: 14px; margin-bottom: 6px; }
+  .ex-num {
+    font-family: "JetBrains Mono", monospace; font-size: 22px; font-weight: 700; color: var(--accent);
+    flex: none; width: 44px;
+  }
+  .ex-head h2 { font-size: 20px; margin: 0; }
+  .ex-lede { color: var(--ink-muted); font-size: 13.5px; margin: 6px 0 22px 58px; max-width: 680px; }
+
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-left: 58px; }
+  @media (max-width: 720px) { .compare { grid-template-columns: 1fr; margin-left: 0; } }
+  .side {
+    border-radius: 12px; padding: 18px 20px; font-size: 13.5px;
+  }
+  .side.old { background: var(--old-soft); border: 1px solid color-mix(in srgb, var(--old) 45%, transparent); }
+  .side.new { background: var(--accent-soft); border: 1px solid var(--accent); }
+  .side .tag {
+    font-family: "JetBrains Mono", monospace; font-size: 10.5px; font-weight: 700; letter-spacing: .05em;
+    margin-bottom: 10px; display: block;
+  }
+  .side.old .tag { color: var(--old); }
+  .side.new .tag { color: var(--accent-strong); }
+  .side p { margin: 0 0 8px; }
+  .side p:last-child { margin-bottom: 0; }
+  .side .quote { font-style: normal; color: var(--ink-muted); }
+
+  .payoff {
+    margin: 16px 58px 0; padding: 12px 16px; border-left: 3px solid var(--accent);
+    font-size: 13.5px; background: none;
+  }
+  @media (max-width: 720px) { .payoff { margin-left: 0; } }
+  .payoff b { color: var(--accent-strong); }
+
+  .proof {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 24px 26px; box-shadow: var(--shadow);
+  }
+  .proof h2 { font-size: 19px; margin: 0 0 10px; }
+  .proof p { font-size: 14px; margin: 0 0 14px; }
+  .proof .btn {
+    display: inline-flex; align-items: center; gap: 8px; background: var(--accent); color: var(--surface);
+    padding: 10px 20px; border-radius: 8px; font-weight: 700; font-size: 13.5px; text-decoration: none;
+  }
+
+  .honesty {
+    background: var(--surface-alt); border-radius: 12px; padding: 20px 24px; font-size: 13px; color: var(--ink-muted);
+  }
+  .honesty b { color: var(--ink); }
+
+  footer { padding: 40px 24px 64px; text-align: center; color: var(--ink-muted); font-size: 12.5px; }
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">演安智策 · 框架价值说明</div>
+    <h1>同一个通道堵了，旧做法和新框架分别会发生什么</h1>
+    <p>不用抽象讲"本体""智能体"是什么——用一个真实会发生的场景，走五遍，看五个具体的差别。</p>
+    <div class="scenario-card">
+      <b>场景：</b>演出开始30分钟后，东侧主通道突发设施故障无法通行，预计20分钟内无法恢复。东侧观众较多，现场有4名保安、3名引导员、2名设备保障人员。
+    </div>
+  </header>
+
+  <section class="ex">
+    <div class="ex-head"><span class="ex-num">01</span><h2>同一条通道，各系统能不能说的是同一件事</h2></div>
+    <p class="ex-lede">最基础、也最容易被忽视的一点：叫法一致不代表系统认识到是同一个对象。</p>
+    <div class="compare">
+      <div class="side old">
+        <span class="tag">旧做法</span>
+        <p class="quote">巡检记录里写"东通道"，预案模板里写"东侧主要通道"，任务系统里叫"E通道"——三套文字描述，系统不知道说的是同一条通道，容易重复建档、任务派错地方。</p>
+      </div>
+      <div class="side new">
+        <span class="tag">这套框架</span>
+        <p class="quote">通道有唯一编号 <span class="mono">PASS-E</span>，无论巡检系统、预案文档还是任务卡提到它，指向的都是同一条记录——查它连接哪些区域、现在能不能走、谁负责，问一次就有唯一答案。</p>
+      </div>
+    </div>
+    <div class="payoff"><b>看得见的效果：</b>不会因为叫法不同而重复建档、任务错挂到不存在的地方。</div>
+  </section>
+
+  <section class="ex">
+    <div class="ex-head"><span class="ex-num">02</span><h2>AI 给建议之前，有没有先看清楚现场"不知道"什么</h2></div>
+    <p class="ex-lede">很多方案生成工具的问题不是编造答案，而是分不清"已确认"和"我猜的"。</p>
+    <div class="compare">
+      <div class="side old">
+        <span class="tag">旧做法</span>
+        <p class="quote">系统检索到"北侧有备用通道"，直接写进预案："建议开放北侧通道分流"——但没人告诉你，这条通道最近一次核查记录已经过期了。</p>
+      </div>
+      <div class="side new">
+        <span class="tag">这套框架</span>
+        <p class="quote">系统区分"这条通道地图上存在"和"现在真的能走"——核查记录过期时，界面明确显示"待核实"，AI 会先建议派人核查，而不是直接把未确认的信息当结论写进方案。</p>
+      </div>
+    </div>
+    <div class="payoff"><b>看得见的效果：</b>方案里不会出现"想当然"的判断，缺口会被摊开，而不是被平滑掉。</div>
+  </section>
+
+  <section class="ex">
+    <div class="ex-head"><span class="ex-num">03</span><h2>预案改一处，任务卡要不要跟着变</h2></div>
+    <p class="ex-lede">预案是给指挥看的文档，任务卡是给执行人看的清单——两者经常不是一回事。</p>
+    <div class="compare">
+      <div class="side old">
+        <span class="tag">旧做法</span>
+        <p class="quote">先生成一份预案文档，再靠人工把预案里的文字拆成一条条任务——预案改了责任人或路径，任务清单不会自动跟着改，容易出现"文档上是A负责，现场分工还是B"。</p>
+      </div>
+      <div class="side new">
+        <span class="tag">这套框架</span>
+        <p class="quote">预案文档和岗位任务卡来自同一份结构化方案——改一次责任人或路径，预案正文和对应的任务卡同步更新，改动会标出"哪些任务受影响"，而不是要人工去对两份文件。</p>
+      </div>
+    </div>
+    <div class="payoff"><b>看得见的效果：</b>预案和执行现场看到的是同一个版本，不会出现"文档一套、现场一套"。</div>
+  </section>
+
+  <section class="ex">
+    <div class="ex-head"><span class="ex-num">04</span><h2>AI 能提议关闭一条通道，但谁点头它才真的关闭</h2></div>
+    <p class="ex-lede">这是给领导汇报时最该讲清楚的一条：AI 的角色边界在哪里。</p>
+    <div class="compare">
+      <div class="side old">
+        <span class="tag">旧做法</span>
+        <p class="quote">"人工确认"往往只是一句话原则，具体到"AI 生成的这一条建议，谁有权批，批了算不算数"，系统层面并没有硬性拦截。</p>
+      </div>
+      <div class="side new">
+        <span class="tag">这套框架</span>
+        <p class="quote">AI 只能"提议"，不能直接生效；现场负责人批准后，系统才会派发任务。如果 AI 或没有权限的账号试图直接申请高权限动作，系统在后端就会拒绝，并记录下这次越权尝试是谁发起、为什么被拒。</p>
+      </div>
+    </div>
+    <div class="payoff"><b>看得见的效果：</b>"AI 出主意、人拍板"不是一句宣传语，是写进权限校验里、可以被拦截验证的规则。</div>
+  </section>
+
+  <section class="ex">
+    <div class="ex-head"><span class="ex-num">05</span><h2>任务显示"已完成"，问题是不是就解决了</h2></div>
+    <p class="ex-lede">最后一条，也是最容易被忽视的一条：执行完不等于处置有效。</p>
+    <div class="compare">
+      <div class="side old">
+        <span class="tag">旧做法</span>
+        <p class="quote">引导员点了"任务完成"，系统就认为这次处置结束了——至于东侧人群有没有真的疏散下去，没有人接着盯。</p>
+      </div>
+      <div class="side new">
+        <span class="tag">这套框架</span>
+        <p class="quote">"任务执行完成"和"现场效果达标"是两条分开记录的证据。系统持续观察东侧情况，如果一段时间后人群密度仍未下降，会自动生成新一轮研判，而不是靠人记得回头再看一眼。</p>
+      </div>
+    </div>
+    <div class="payoff"><b>看得见的效果：</b>"做了"和"有效"是两件事，系统不会把按钮点击当成问题解决的证据。</div>
+  </section>
+
+  <section class="ex">
+    <div class="proof">
+      <h2>这不是只停留在设计上</h2>
+      <p>以上五个对比对应的界面和交互，已经有一版可以现场点开演示的原型（对齐了现有 <span class="mono">backend/</span>、<span class="mono">frontend/</span> 真实代码的状态机和数据结构，不是另起一套假想的界面）。</p>
+      <a class="btn" href="复兴岛应急演示系统.html">打开可点击演示原型 →</a>
+    </div>
+  </section>
+
+  <section class="ex">
+    <div class="honesty">
+      <b>需要如实说明的一点：</b>以上是这套框架的设计预期，也是我们接下来三个月要验证的东西——需求文档里专门设计了对照实验（同一场景下，比较"原有生成流程"“统一对象+规则”“加一个AI”“加多个AI”四种配置的实际表现），用来确认这些优势是真的成立、成立到什么程度，而不是先假定它一定更好。这也是这套框架希望体现的态度：结论要能被检验，不做"全面领先""首创"这类无法验证的表述。
+    </div>
+  </section>
+
+  <footer>演安智策 · 复兴岛大型活动应急协同与人机决策实践平台 · 框架价值说明</footer>
+</div>

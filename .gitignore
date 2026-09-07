@@ -1,0 +1,40 @@
+# ---- Python (backend/) ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.venv-local/
+*.db
+*.db-journal
+
+# ---- Node (frontend/, admin/) ----
+node_modules/
+dist/
+.vite/
+
+# ---- Secrets: never commit real credentials ----
+.env
+!.env.example
+!.env.development
+
+# ---- Runtime storage / uploaded files ----
+backend/storage/*
+!backend/storage/.gitkeep
+
+# ---- OS ----
+.DS_Store
+
+# ---- Duplicate/unresolved code copy (see PROJECT_STATUS.md) ----
+# 代码/frontend has its own separate git history (Codex commit) and duplicates
+# backend/frontend/admin above; excluded until the team decides which is authoritative.
+代码/
+
+# ---- Internal proposal/funding materials (contain real names + budget figures) ----
+# Excluded from this public repo by decision; kept locally only.
+*.pptx
+*.docx
+
+# ---- Reference images pasted from another (external) project, not ours ----
+机制示意.png
+经验积累.png
+整体框架.png

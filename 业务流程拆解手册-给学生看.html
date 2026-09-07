@@ -1,0 +1,283 @@
+<meta charset="utf-8">
+<title>业务流程拆解手册</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700;900&family=Noto+Sans+SC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #F3EEE3; --surface: #FFFFFF; --surface-alt: #EAE2D0;
+    --ink: #1E2A2E; --ink-muted: #5C6B70;
+    --accent: #1F6E7A; --accent-strong: #123F47; --accent-soft: #D7E7E4;
+    --line: rgba(30, 42, 46, 0.15); --line-strong: rgba(30, 42, 46, 0.28);
+    --found: #6B4E9E; --found-soft: #E7E0F1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #11181A; --surface: #1A2325; --surface-alt: #202B2C;
+      --ink: #E9EEEA; --ink-muted: #9BA9A8;
+      --accent: #63BCC5; --accent-strong: #96D6DC; --accent-soft: rgba(99,188,197,0.14);
+      --line: rgba(233,238,234,0.14); --line-strong: rgba(233,238,234,0.26);
+      --found: #B7A0E0; --found-soft: rgba(183,160,224,0.14);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #11181A; --surface: #1A2325; --surface-alt: #202B2C;
+    --ink: #E9EEEA; --ink-muted: #9BA9A8;
+    --accent: #63BCC5; --accent-strong: #96D6DC; --accent-soft: rgba(99,188,197,0.14);
+    --line: rgba(233,238,234,0.14); --line-strong: rgba(233,238,234,0.26);
+    --found: #B7A0E0; --found-soft: rgba(183,160,224,0.14);
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    line-height: 1.72; -webkit-font-smoothing: antialiased;
+    max-width: 100%; overflow-x: hidden;
+  }
+  h1, h2, h3 { font-family: "Noto Serif SC", "Songti SC", serif; font-weight: 800; text-wrap: balance; }
+  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+
+  header.hero { padding: 56px 0 30px; border-bottom: 1px solid var(--line); }
+  .eyebrow {
+    font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
+  }
+  header.hero h1 { font-size: clamp(24px, 3.6vw, 32px); line-height: 1.35; margin: 0 0 16px; }
+  header.hero p { font-size: 15px; color: var(--ink-muted); max-width: 640px; margin: 0; }
+
+  .toc { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+  .toc a {
+    font-size: 12px; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--line-strong);
+    color: var(--ink-muted); text-decoration: none; background: var(--surface);
+  }
+  .toc a:hover { color: var(--accent-strong); border-color: var(--accent); }
+  .toc a.found { color: var(--found); border-color: var(--found); }
+
+  section.proc { padding: 38px 0; border-bottom: 1px solid var(--line); scroll-margin-top: 20px; }
+  section.proc:last-of-type { border-bottom: none; }
+  .proc-head { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+  .proc-num {
+    font-family: "JetBrains Mono", monospace; font-size: 13px; font-weight: 700; color: var(--surface);
+    background: var(--accent); border-radius: 999px; width: 30px; height: 30px; flex: none;
+    display: flex; align-items: center; justify-content: center; margin-top: 2px;
+  }
+  .proc-num.found { background: var(--found); }
+  .proc-head h2 { font-size: 18px; margin: 0; }
+  .proc-head .stage { font-size: 11.5px; color: var(--ink-muted); font-family: "JetBrains Mono", monospace; margin-top: 3px; }
+
+  .block { margin: 0 0 14px 44px; }
+  @media (max-width: 600px) { .block { margin-left: 0; } }
+  .block .lbl {
+    font-family: "JetBrains Mono", monospace; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--accent-strong); margin-bottom: 6px; display: block; font-weight: 700;
+  }
+  .block p { margin: 0; font-size: 13.8px; }
+  .block ul { margin: 4px 0 0; padding-left: 20px; }
+  .block li { margin-bottom: 5px; font-size: 13.5px; }
+  .block.work { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 18px; }
+  .block.work .lbl { color: var(--ink-muted); }
+  .block.found-note { background: var(--found-soft); border-radius: 10px; padding: 12px 16px; margin-left: 44px; }
+  .block.found-note .lbl { color: var(--found); }
+
+  .callout {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px 24px;
+  }
+  .callout h3 { font-size: 15px; margin: 0 0 8px; }
+  .callout p { font-size: 13.5px; margin: 0; color: var(--ink-muted); }
+
+  footer { padding: 36px 24px 60px; text-align: center; color: var(--ink-muted); font-size: 12.5px; }
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">演安智策 · 写给刚接手的同学</div>
+    <h1>这个系统一共有几条业务流程，每条流程要做什么</h1>
+    <p>不按"谁负责"分（那是开发计划的事），这里按"系统里实际发生的一件事"分——每条流程讲清楚三件事：<b>它在解决什么问题</b>、<b>为什么少不了它</b>、<b>要把它做出来需要具体做哪些工作</b>。</p>
+    <div class="toc" id="toc"></div>
+  </header>
+
+  <section class="proc" id="p0">
+    <div class="proc-head">
+      <span class="proc-num found">0</span>
+      <div><h2>本体维护流程 —— 所有流程共用的地基</h2><div class="stage">贯穿全程，不是某一步，而是所有步骤都依赖它</div></div>
+    </div>
+    <div class="block"><span class="lbl">是什么</span><p>给活动、通道、区域、岗位、设备这些"东西"分配唯一编号，并且维护它们之间的关系（比如"东侧主通道连接哪些区域"）。可以理解成给系统建一本户口簿，往后所有流程说的"东侧通道"都指同一条记录，不是各自猜。</p></div>
+    <div class="block"><span class="lbl">为什么少不了</span><p>如果这一步没做好，后面每一条流程都会各说各话——事件里的"东通道"、预案里的"东侧主要通道"、任务卡里的"E通道"，系统分不清是不是同一个东西，会导致重复建档、任务派错对象。</p></div>
+    <div class="block work">
+      <span class="lbl">要做的工作</span>
+      <ul>
+        <li>设计对象字段：给通道、区域、岗位等定义清楚要记录哪些信息（编号、名称、连接关系、当前状态）</li>
+        <li>处理别名问题：同一条通道有几种叫法时，怎么让系统认成一个对象（需要人工确认一次，之后自动关联）</li>
+        <li>区分"状态"和"证据"两种标记：比如"通道能不能走"是状态，"这个判断是什么时候、靠什么信息确认的"是证据——两者要分开记录，不能只记结论</li>
+      </ul>
+    </div>
+    <div class="block found-note"><span class="lbl">给学生的提示</span>这是最不起眼、但最容易被低估的一块——后面九条流程只要涉及"查某个对象现在状态如何"，都要来问这一层。这一层没打好，后面调试时会经常出现"数据对不上"的诡异 bug。</div>
+  </section>
+
+  <section class="proc" id="p1">
+    <div class="proc-head"><span class="proc-num">1</span><div><h2>活动与场景配置流程</h2><div class="stage">事前 · 一次性录入，之后复用</div></div></div>
+    <div class="block"><span class="lbl">是什么</span><p>录入一场活动的基本信息（时间、地点、类型），配置这场活动用到的场地（有哪些通道、出入口、设施），以及现场有哪些岗位、有多少人和物资。</p></div>
+    <div class="block"><span class="lbl">为什么少不了</span><p>后面所有判断——"备用通道能不能走""引导员够不够用"——都要先知道现场实际有什么。这一步不做，AI 生成的方案只能是空对空的套话。</p></div>
+    <div class="block work">
+      <span class="lbl">要做的工作</span>
+      <ul>
+        <li>活动创建表单：名称、类型、时间、地点</li>
+        <li>场景配置表单：关键通道、出入口、关键设施、可用岗位、基本资源，逗号分隔录入即可，不用做复杂的地图编辑器</li>
+        <li>做好"没配置场景就不能往下走"的提示，别让人跳步骤</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="proc" id="p2">
+    <div class="proc-head"><span class="proc-num">2</span><div><h2>事件确认流程</h2><div class="stage">事中 · 六步流程第①步</div></div></div>
+    <div class="block"><span class="lbl">是什么</span><p>把一段口头或文字描述的突发情况（"东侧通道堵了"）变成结构化数据：事件类型、风险等级、影响范围、涉及岗位、还缺哪些信息。</p></div>
+    <div class="block"><span class="lbl">为什么少不了</span><p>后面知识检索、方案生成，都是在查询这些结构化字段——不把一句话拆解成字段，后面的流程无从下手。同时要让人能看到、能改 AI 提取的结果，不能 AI 说什么就是什么。</p></div>
+    <div class="block work">
+      <span class="lbl">要做的工作</span>
+      <ul>
+        <li>自然语言录入 + 表单录入两种入口（表单是兜底，模型出问题时也能继续演示）</li>
+        <li>调用大模型，把描述拆成结构化字段（这是需要写 Prompt、调试抽取准确率的地方）</li>
+        <li>把 AI 提取的结果做成可编辑表单，人工确认无误后才能进入下一步</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="proc" id="p3">
+    <div class="proc-head"><span class="proc-num">3</span><div><h2>知识检索流程</h2><div class="stage">事中 · 六步流程第②步</div></div></div>
+    <div class="block"><span class="lbl">是什么</span><p>根据事件的类型、地点、风险等级，去知识库里找相关的历史预案、相似案例、岗位职责、场地资料。</p></div>
+    <div class="block"><span class="lbl">为什么少不了</span><p>这是让 AI 生成的方案"有依据"而不是"编出来"的关键一步——找到的资料会被后面的预案引用，写清楚"这条建议是根据哪份文件"。</p></div>
+    <div class="block work">
+      <span class="lbl">要做的工作</span>
+      <ul>
+        <li>文档上传、解析、切分成片段并入库</li>
+        <li>检索算法：先做关键词检索能跑通就行，向量语义检索是加分项不是及格线</li>
+        <li>检索结果为空时要如实提示"没找到"，不能悄悄跳过这一步装作有依据</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="proc" id="p4">
+    <div class="proc-head"><span class="proc-num">4</span><div><h2>预案生成流程</h2><div class="stage">事中 · 六步流程第③步</div></div></div>
+    <div class="block"><span class="lbl">是什么</span><p>把事件信息和检索到的知识整合成一份结构化应急预案：事件概况、处置目标、响应原则、组织职责、处置流程、岗位要求、报告机制、升级/恢复/终止条件、知识引用——固定九段。</p></div>
+    <div class="block"><span class="lbl">为什么少不了</span><p>这是系统最核心的产出物，也是最能体现"AI 有没有真的理解现场"的一步。九段结构不是排版好看，是让人能按图索骥地审核每一部分依据是否充分。</p></div>
+    <div class="block work">
+      <span class="lbl">要做的工作</span>
+      <ul>
+        <li>设计生成九段内容的 Prompt，并把输出约束成结构化 JSON（不能是一段自由文本）</li>
+        <li>做版本管理：每次生成或人工修改都留一条版本记录</li>
+        <li>支持"只重新生成某一段"，不用整份推倒重来</li>
+        <li>大模型没接入或调用失败时，能"载入示例预案"把后面的演示走通</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="proc" id="p5">
+    <div class="proc-head"><span class="proc-num">5</span><div><h2>任务分解流程</h2><div class="stage">事中 · 六步流程第④步</div></div></div>
+    <div class="block"><span class="lbl">是什么</span><p>把预案拆解成一条条具体任务：谁执行、在哪做、做什么动作、多久内完成、需要什么资源、完成标准是什么。</p></div>
+    <div class="block"><span class="lbl">为什么少不了</span><p>预案是给指挥看的整体方案，任务卡是给具体执行人看的清单——两者字段不同、受众不同，但必须来自同一份方案，不能各写各的。</p></div>
+    <div class="block work">
+      <span class="lbl">要做的工作</span>
+      <ul>
+        <li>任务生成逻辑：从预案的"处置流程"和"岗位要求"两段推导出具体任务</li>
+        <li>资源与人员冲突检测：同一个人被同时排进两个任务时要能发现（这是最容易漏掉的校验）</li>
+        <li>任务列表支持按岗位/按阶段/按计划时间三种方式分组查看</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="proc" id="p6">
+    <div class="proc-head"><span class="proc-num">6</span><div><h2>行动审批流程</h2><div class="stage">事中 · 贯穿②③④步的一条约束线</div></div></div>
+    <div class="block"><span class="lbl">是什么</span><p>规定"AI 生成的每一步建议要变成正式动作，必须经过谁、按什么条件批准"——不是一个单独的页面，而是嵌在预案确认、任务确认这些按钮背后的校验逻辑。</p></div>
+    <div class="block"><span class="lbl">为什么少不了</span><p>这是"AI 只能建议、人来决定"这句话在代码里的落地方式。没有这一层，AI 生成的内容和正式生效的内容之间就没有边界，说是"人工确认"其实拦不住任何东西。</p></div>
+    <div class="block work">
+      <span class="lbl">要做的工作</span>
+      <ul>
+        <li>定义清楚"确认预案""确认任务""批准恢复通行"这类动作各自需要什么条件才能提交</li>
+        <li>批准后如果现场关键状态发生了变化，要能让相关动作重新变回"待复核"，不能沿用过期的批准</li>
+        <li>越权请求（没有权限的人/账号直接申请生效）要在后端就被拒绝，而不是只在前端隐藏按钮</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="proc" id="p7">
+    <div class="proc-head"><span class="proc-num">7</span><div><h2>执行跟踪流程</h2><div class="stage">事中 · 六步流程第⑤步</div></div></div>
+    <div class="block"><span class="lbl">是什么</span><p>记录每个任务实际的执行情况：开始、完成、未完成、取消，并统计整体和分岗位的完成率。</p></div>
+    <div class="block"><span class="lbl">为什么少不了</span><p>系统里的"状态"必须如实反映现场，不能因为差不多做完了就标"已完成"——这是后面复盘和效果判断的原始数据来源。</p></div>
+    <div class="block work">
+      <span class="lbl">要做的工作</span>
+      <ul>
+        <li>任务状态机：未开始→执行中→已完成/未完成/取消，每种切换按钮要按当前状态正确开关</li>
+        <li>执行记录表单：执行人、执行结果、遇到的问题、临时调整</li>
+        <li>完成率统计和分岗位进度展示</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="proc" id="p8">
+    <div class="proc-head"><span class="proc-num">8</span><div><h2>效果反馈与动态调整流程</h2><div class="stage">事中 · 三个月冲刺计划里明确推迟的部分</div></div></div>
+    <div class="block"><span class="lbl">是什么</span><p>任务执行完之后，持续观察现场效果有没有真的达标；如果一段时间后仍未达标，自动生成新一轮研判，而不是靠人记得回头再看。</p></div>
+    <div class="block"><span class="lbl">为什么少不了</span><p>"任务完成"和"问题解决"是两件事——没有这一层，系统会把"按钮点完了"当成处置成功的证据，这正是这套框架最想避免的错误。</p></div>
+    <div class="block work">
+      <span class="lbl">要做的工作</span>
+      <ul>
+        <li>定义观察指标、基线、观察时间窗（方案确认时就要定好，不能事后再补）</li>
+        <li>偏差检测：超过观察窗口仍未达标时自动创建新事件</li>
+        <li>把新一轮方案和上一版的继承关系记清楚，避免重复计数</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="proc" id="p9">
+    <div class="proc-head"><span class="proc-num">9</span><div><h2>复盘与经验沉淀流程</h2><div class="stage">事后 · 六步流程第⑥步</div></div></div>
+    <div class="block"><span class="lbl">是什么</span><p>从整个处置过程的记录里自动生成一份复盘报告：时间线、任务完成情况、有效做法、存在问题、改进建议，经审核后可以沉淀成新的案例，进知识库供下次检索。</p></div>
+    <div class="block"><span class="lbl">为什么少不了</span><p>不做这一步，每次处置都是一次性的，经验留不下来——这也是"预案生成/现场处置/教学"能形成闭环的最后一环。</p></div>
+    <div class="block work">
+      <span class="lbl">要做的工作</span>
+      <ul>
+        <li>从事件、方案、任务、执行记录自动拼出时间线和统计数字</li>
+        <li>区分"已确认事实"和"原因假设"，不能把没验证的猜测写成结论</li>
+        <li>"沉淀为案例"要经过人工审核才正式进知识库，不能自动生效</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="proc" id="p10">
+    <div class="proc-head"><span class="proc-num">10</span><div><h2>教学实验流程</h2><div class="stage">拟建设 · 三个月冲刺计划里明确推迟的部分</div></div></div>
+    <div class="block"><span class="lbl">是什么</span><p>让学生在一个隔离环境里重复练习上面 1–9 条流程，教师可以配置场景、注入意外状况（比如"临时又有一条通道堵了"），系统按固定规则给出量化评分。</p></div>
+    <div class="block"><span class="lbl">为什么少不了</span><p>这是这个项目"产教研"里"教"的部分——没有隔离环境，学生练习时的操作会污染真实数据；没有固定评分规则，教学效果没法量化比较。</p></div>
+    <div class="block work">
+      <span class="lbl">要做的工作</span>
+      <ul>
+        <li>场景快照与环境隔离：每组学生的实验互不影响，也不影响真实业务数据</li>
+        <li>扰动注入机制：教师能在实验进行中临时改变现场条件</li>
+        <li>固定评分规则：覆盖率、冲突检出数、响应耗时这些客观指标由代码算，不是人工估分</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="proc">
+    <div class="callout">
+      <h3>整体上怎么记这十一条流程</h3>
+      <p>流程0是地基，1是准备工作，2-3-4-5是"从一句话到一份任务清单"的生成链路，6是嵌在2-5里的安全阀不是独立步骤，7-8是"做没做、有没有用"，9是收尾攒经验，10是把前面全部搬到教室里用。三个月冲刺阶段只做 0、1、2、4、5、6、7 这几条的最小版本，8、9、10 留到后面。</p>
+    </div>
+  </section>
+
+  <footer>演安智策 · 业务流程拆解手册 · 配合《三个月冲刺计划》与《开发计划-三人小组》一起看</footer>
+</div>
+
+<script>
+  var titles = [
+    ["p0", "0 本体维护", true], ["p1", "1 活动场景"], ["p2", "2 事件确认"], ["p3", "3 知识检索"],
+    ["p4", "4 预案生成"], ["p5", "5 任务分解"], ["p6", "6 行动审批"], ["p7", "7 执行跟踪"],
+    ["p8", "8 效果反馈"], ["p9", "9 复盘沉淀"], ["p10", "10 教学实验"]
+  ];
+  var toc = document.getElementById("toc");
+  titles.forEach(function (t) {
+    var a = document.createElement("a");
+    a.href = "#" + t[0]; a.textContent = t[1];
+    if (t[2]) a.className = "found";
+    toc.appendChild(a);
+  });
+</script>

@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>复兴岛 · 演出中场景:前区人群安全演示</title>
+<style>
+  :root{
+    --bg:#0a111c; --panel:#0f1826; --panel2:#131f30; --line:#1e2d42;
+    --ink:#d8e1ea; --muted:#77869a; --dim:#4a5a70;
+    --amber:#f2b544; --teal:#38c9a8; --red:#e5484d; --blue:#5aa2e8; --violet:#9d7bea;
+    --mono:ui-monospace,"SF Mono","Cascadia Mono",Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--ink);
+    font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
+    font-size:14px;overflow:hidden}
+  #app{display:grid;height:100vh;
+    grid-template-rows:46px 1fr 126px;
+    grid-template-columns:minmax(0,1.55fr) minmax(350px,1fr);
+    grid-template-areas:"hd hd" "map log" "ft log"}
+  header{grid-area:hd;display:flex;align-items:center;gap:12px;
+    padding:0 16px;border-bottom:1px solid var(--line);background:var(--panel)}
+  header h1{font-size:15px;font-weight:600;letter-spacing:.05em}
+  header h1 b{color:var(--violet);font-weight:600}
+  .chip{font-family:var(--mono);font-size:11px;padding:3px 9px;border-radius:3px;
+    border:1px solid var(--line);color:var(--muted);letter-spacing:.08em}
+  .chip.live{border-color:var(--teal);color:var(--teal)}
+  .chip.warn{border-color:var(--red);color:var(--red);animation:pulse 1.2s infinite}
+  .chip.auto{border-color:var(--blue);color:var(--blue)}
+  #clock{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--muted)}
+  @keyframes pulse{50%{opacity:.45}}
+  @media (prefers-reduced-motion:reduce){.chip.warn,.btn.pulse,.evbtn.ready{animation:none}}
+
+  #mapwrap{grid-area:map;position:relative;background:#0a1524;overflow:hidden}
+  canvas{display:block;width:100%;height:100%}
+  #banner{position:absolute;top:14px;left:50%;transform:translateX(-50%);
+    font-size:13px;padding:7px 18px;border-radius:4px;display:none;
+    backdrop-filter:blur(4px);white-space:nowrap;border:1px solid}
+  #banner.red{background:rgba(229,72,77,.12);border-color:var(--red);color:#ff9b9e}
+  #banner.teal{background:rgba(56,201,168,.1);border-color:var(--teal);color:#7fe0c9}
+
+  #events{position:absolute;right:14px;top:14px;width:238px;z-index:4;
+    background:rgba(10,17,28,.85);border:1px solid var(--line);border-radius:6px;
+    padding:10px 12px;backdrop-filter:blur(5px)}
+  #events .t{font-size:10px;color:var(--dim);letter-spacing:.16em;margin-bottom:8px}
+  .evbtn{display:block;width:100%;text-align:left;margin-bottom:7px;padding:8px 10px;
+    background:var(--panel2);border:1px solid var(--line);border-radius:4px;color:var(--ink);
+    font-family:inherit;font-size:12px;cursor:pointer;line-height:1.5}
+  .evbtn:hover:not(:disabled){border-color:var(--muted)}
+  .evbtn:disabled{opacity:.32;cursor:not-allowed}
+  .evbtn.ready{animation:glowp 1.6s infinite}
+  .evbtn .lv{font-family:var(--mono);font-size:10px;padding:1px 5px;border-radius:2px;margin-right:6px}
+  .lv1{background:rgba(90,162,232,.18);color:var(--blue)}
+  .lv2{background:rgba(242,181,68,.18);color:var(--amber)}
+  .lv3{background:rgba(229,72,77,.18);color:#ff9b9e}
+  .evbtn small{color:var(--dim);display:block;margin-top:2px;font-size:10.5px}
+  @keyframes glowp{50%{box-shadow:0 0 12px rgba(242,181,68,.45)}}
+
+  #legend{position:absolute;left:14px;bottom:12px;font-size:11px;color:var(--muted);
+    background:rgba(10,17,28,.72);padding:7px 12px;border-radius:4px;line-height:1.9;
+    border:1px solid var(--line)}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+  #overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    background:rgba(10,17,28,.84);flex-direction:column;gap:18px;z-index:6}
+  #overlay p{color:var(--muted);max-width:480px;text-align:center;line-height:1.85;font-size:13px}
+  #overlay .lvrow{display:flex;gap:10px}
+  #overlay .lvcard{border:1px solid var(--line);border-radius:5px;padding:10px 14px;width:158px;
+    font-size:11.5px;line-height:1.7;color:var(--muted);background:var(--panel2)}
+  #overlay .lvcard b{display:block;font-size:12.5px;margin-bottom:2px}
+
+  .btn{font-family:inherit;font-size:13px;padding:9px 22px;border-radius:4px;cursor:pointer;
+    border:1px solid var(--line);background:var(--panel2);color:var(--ink);letter-spacing:.04em}
+  .btn:hover{border-color:var(--muted)}
+  .btn.primary{background:var(--amber);border-color:var(--amber);color:#1a1508;font-weight:600}
+  .btn.primary:hover{filter:brightness(1.08)}
+  .btn:disabled{opacity:.35;cursor:not-allowed}
+  .btn.pulse{animation:glowp 1.4s infinite}
+  .btn.sm{font-size:11.5px;padding:5px 14px}
+
+  #log{grid-area:log;border-left:1px solid var(--line);background:var(--panel);
+    display:flex;flex-direction:column;min-height:0}
+  #log>.hd{padding:10px 16px;border-bottom:1px solid var(--line);font-size:12px;
+    color:var(--muted);letter-spacing:.14em;display:flex;justify-content:space-between}
+  #stream{flex:1;overflow-y:auto;padding:12px 14px;scroll-behavior:smooth}
+  #stream::-webkit-scrollbar{width:4px}
+  #stream::-webkit-scrollbar-thumb{background:var(--line)}
+  .entry{margin-bottom:13px;border:1px solid var(--line);border-radius:5px;
+    background:var(--panel2);overflow:hidden;opacity:0;transform:translateY(6px);
+    transition:opacity .3s,transform .3s}
+  .entry.show{opacity:1;transform:none}
+  .entry .ehd{display:flex;align-items:center;gap:8px;padding:7px 12px;
+    border-bottom:1px solid var(--line);font-size:12px}
+  .badge{font-size:11px;padding:2px 8px;border-radius:3px;font-weight:600;letter-spacing:.05em}
+  .b-sit{background:rgba(90,162,232,.15);color:var(--blue)}
+  .b-risk{background:rgba(229,72,77,.15);color:#ff9b9e}
+  .b-strat{background:rgba(56,201,168,.15);color:var(--teal)}
+  .b-cmd{background:rgba(242,181,68,.15);color:var(--amber)}
+  .b-route{background:rgba(216,225,234,.1);color:var(--ink)}
+  .ehd time{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--dim)}
+  .entry .body{padding:9px 12px;line-height:1.75;font-size:12.5px}
+  .kv{display:flex;gap:8px;margin-bottom:3px}
+  .kv .k{color:var(--dim);flex:none;font-size:11px;padding-top:2px;width:34px;letter-spacing:.1em}
+  .kv .v{color:var(--ink)}
+  .cite{font-family:var(--mono);font-size:11px;color:var(--amber);cursor:help;
+    border-bottom:1px dashed rgba(242,181,68,.5);position:relative}
+  .cite:hover::after{content:attr(data-tip);position:absolute;left:0;top:130%;z-index:9;
+    background:#1c2a3d;border:1px solid var(--line);color:var(--ink);padding:8px 10px;
+    width:240px;font-family:inherit;font-size:11.5px;line-height:1.6;border-radius:4px;
+    white-space:normal;font-weight:400}
+  .routebar{display:flex;gap:6px;align-items:center;font-family:var(--mono);font-size:11px;margin-top:4px}
+  .routebar .rb{padding:2px 8px;border-radius:2px;border:1px solid var(--line);color:var(--muted)}
+  .routebar .rb.hit{border-color:var(--amber);color:var(--amber)}
+  .plancard{border:1px solid var(--line);border-radius:4px;margin-top:8px;padding:9px 11px;
+    background:rgba(10,17,28,.5)}
+  .plancard.rec{border-color:var(--amber)}
+  .plancard .pn{font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:8px}
+  .tag{font-size:10px;color:var(--amber);border:1px solid var(--amber);padding:1px 6px;border-radius:2px}
+  .pm{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:5px;line-height:1.8}
+  .pm b{color:var(--teal);font-weight:600}
+  .pm .risk{color:#ff9b9e}
+  .mini{width:100%;height:44px;margin-top:6px;background:rgba(10,17,28,.6);border-radius:3px}
+  .rollout{font-size:10.5px;color:var(--dim);font-family:var(--mono);margin-top:4px}
+  #approvewrap{padding:12px 14px;border-top:1px solid var(--line);display:none;gap:10px}
+  #approvewrap .hint{font-size:11px;color:var(--muted);align-self:center}
+
+  #ft{grid-area:ft;border-top:1px solid var(--line);background:var(--panel);
+    display:grid;grid-template-columns:1fr 300px;min-width:0}
+  #chartbox{position:relative;padding:8px 4px 4px 12px;min-width:0}
+  #chartbox .cl{position:absolute;top:8px;left:14px;font-size:10px;color:var(--muted);
+    letter-spacing:.12em;z-index:2}
+  #chart{width:100%;height:100%}
+  #stats{border-left:1px solid var(--line);padding:10px 16px;display:grid;
+    grid-template-columns:1fr 1fr;gap:2px 14px;align-content:center}
+  .st .n{font-family:var(--mono);font-size:19px;font-weight:600;color:var(--ink)}
+  .st .n.good{color:var(--teal)} .st .n.bad{color:var(--red)}
+  .st .l{font-size:10px;color:var(--dim);letter-spacing:.1em;margin-top:1px}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>复兴岛 <b>·</b> 演出中 · 前区人群安全演示</h1>
+    <span class="chip" id="phase">待命</span>
+    <span class="chip auto">L1 自动</span><span class="chip" style="border-color:var(--amber);color:var(--amber)">L2 人机确认</span><span class="chip" style="border-color:var(--red);color:#ff9b9e">L3 推演决策</span>
+    <span id="clock">T+00:00</span>
+  </header>
+
+  <div id="mapwrap">
+    <canvas id="map"></canvas>
+    <div id="banner"></div>
+    <div id="events">
+      <div class="t">事件注入(建议按序)</div>
+      <button class="evbtn" id="ev1" disabled>
+        <span class="lv lv1">L1</span>压轴预告 · 前区涌动
+        <small>低风险 · 预期:审定模板自动处置,全程留痕</small>
+      </button>
+      <button class="evbtn" id="ev2" disabled>
+        <span class="lv lv2">L2</span>前区医疗事件
+        <small>中风险 · 预期:开辟医疗通道,指挥员确认</small>
+      </button>
+      <button class="evbtn" id="ev3" disabled>
+        <span class="lv lv3">L3</span>密度破限 · 是否暂停演出
+        <small>高风险 · 预期:三方案推演,价值权衡人来选</small>
+      </button>
+    </div>
+    <div id="legend">
+      <span class="dot" style="background:#e8d9a8"></span>观众
+      &nbsp;<span class="dot" style="background:#ff8c78"></span>持续前挤
+      &nbsp;<span class="dot" style="background:var(--teal)"></span>医疗通道
+      &nbsp;<span class="dot" style="background:rgba(229,72,77,.4)"></span>高密度
+    </div>
+    <div id="overlay">
+      <div class="lvrow">
+        <div class="lvcard"><b style="color:var(--blue)">L1 自动响应</b>前区满员提示模板自动播发,系统安静处置</div>
+        <div class="lvcard"><b style="color:var(--amber)">L2 人机确认</b>人墙中开辟医疗通道,批准后执行</div>
+        <div class="lvcard"><b style="color:#ff9b9e">L3 推演决策</b>是否暂停演出——安全/秩序/商业三目标冲突,人来选</div>
+      </div>
+      <button class="btn primary" id="startBtn" style="font-size:15px;padding:12px 34px">开始演示</button>
+      <p>演出进行中,约1,100名观众聚集在舞台前。与散场不同,这里的风险是<b style="color:#ff9b9e">静态密度</b>——人不想走,密度自己长出来。梨泰院与 Astroworld 的悲剧都发生在这种形态。请依次注入三类事件。</p>
+    </div>
+  </div>
+
+  <div id="log">
+    <div class="hd"><span>AGENT 会商记录</span><span id="round">—</span></div>
+    <div id="stream"></div>
+    <div id="approvewrap">
+      <button class="btn primary pulse" id="approveBtn">批准方案</button>
+      <button class="btn" id="rejectBtn">驳回</button>
+      <span class="hint" id="approvehint">L2 · 待指挥员确认</span>
+    </div>
+  </div>
+
+  <div id="ft">
+    <div id="chartbox">
+      <span class="cl">前区人群密度(人/㎡) — 实线:实际 · 虚线:预期 · 红线:阈值3.0</span>
+      <canvas id="chart"></canvas>
+    </div>
+    <div id="stats">
+      <div class="st"><div class="n" id="sShow" style="color:var(--violet)">进行中</div><div class="l">演出状态</div></div>
+      <div class="st"><div class="n" id="sDen">0.0</div><div class="l">前区密度</div></div>
+      <div class="st"><div class="n" id="sPeak">0.0</div><div class="l">峰值密度</div></div>
+      <div class="st"><div class="n" id="sL">0/0/0</div><div class="l">L1/L2/L3 处置</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const map=$("map"),mctx=map.getContext("2d");
+const chart=$("chart"),cctx=chart.getContext("2d");
+function resize(){
+  const r=map.parentElement.getBoundingClientRect();
+  map.width=r.width*devicePixelRatio;map.height=r.height*devicePixelRatio;
+  mctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  const c=chart.parentElement.getBoundingClientRect();
+  chart.width=c.width*devicePixelRatio;chart.height=c.height*devicePixelRatio;
+  cctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  layout();
+}
+window.addEventListener("resize",resize);
+
+/* ---------- 布局:岛 + 舞台 + 前区 ---------- */
+let isl,stage,front,medPoint,aidStation;
+function layout(){
+  const w=map.parentElement.clientWidth,h=map.parentElement.clientHeight;
+  const cx=w*0.46,cy=h*0.52,rw=Math.min(w*0.36,380),rh=Math.min(h*0.34,235);
+  isl={cx,cy,rw,rh,rot:-0.28};
+  stage={x:cx-rw*0.62,y:cy,w:46,h:110};                 // 舞台在岛西侧
+  front={x:stage.x+82,y:stage.y,r:66};                  // 前区
+  medPoint={x:front.x+18,y:front.y-14};                 // 医疗事发点
+  aidStation={x:stage.x+30,y:stage.y+rh*0.72};          // 南侧医疗点
+}
+
+/* ---------- 静态人群仿真:吸引/停驻/回退 ---------- */
+const N=1100;
+let agents=[],peakDen=0;
+const GRID=18;let gm=new Map();
+function rnd(a,b){return a+Math.random()*(b-a)}
+function spawn(){
+  agents=[];peakDen=0;
+  for(let i=0;i<N;i++){
+    const ang=rnd(-1.05,1.05),dist=rnd(120,380);
+    const x=stage.x+Math.cos(ang)*dist,y=stage.y+Math.sin(ang)*dist;
+    agents.push({x,y,ax:x,ay:y,drive:0.12,comp:true});
+  }
+}
+let corridor=null; // {t:0..1 相位, sx,sy,mx,my}
+function stepSim(dt){
+  gm.clear();
+  for(const a of agents){const k=((a.x/GRID)|0)+","+((a.y/GRID)|0);gm.set(k,(gm.get(k)||0)+1)}
+  for(const a of agents){
+    // 医疗通道:沿线观众侧移让出走廊
+    if(corridor){
+      const{sx,sy,mx,my}=corridor;
+      const vx=mx-sx,vy=my-sy,L2=vx*vx+vy*vy;
+      let t=((a.x-sx)*vx+(a.y-sy)*vy)/L2;t=Math.max(0,Math.min(1,t));
+      const px=sx+vx*t,py=sy+vy*t;
+      const dx=a.x-px,dy=a.y-py,pd=Math.hypot(dx,dy);
+      if(pd<16){const s=(16-pd+2)*3.2*dt;a.x+=dx/(pd||1)*s;a.y+=dy/(pd||1)*s;continue}
+    }
+    const k=((a.x/GRID)|0)+","+((a.y/GRID)|0);
+    const local=gm.get(k)||0;
+    const packLimit=3+a.drive*13;
+    const retreat=a.drive<=0.05;
+    let tx,ty;
+    if(!retreat){tx=stage.x;ty=stage.y}
+    else{tx=a.ax+(a.x-stage.x)*0.5;ty=a.ay+(a.y-stage.y)*0.5}
+    let dx=tx-a.x,dy=ty-a.y;const d=Math.hypot(dx,dy)||1;
+    if(!retreat&&d<40)continue;
+    if(retreat&&d<8)continue;
+    let cong=Math.max(0,Math.min(1,(packLimit-local)/packLimit));
+    if(retreat)cong=Math.max(0.35,cong);
+    const v=(retreat?0.5:a.drive)*24*cong*dt;
+    a.x+=dx/d*v+(Math.random()-.5)*.4;
+    a.y+=dy/d*v+(Math.random()-.5)*.4;
+  }
+}
+function densityFront(){
+  let c=0;const r2=front.r*front.r;
+  for(const a of agents){const dx=a.x-front.x,dy=a.y-front.y;
+    if(dx*dx+dy*dy<r2)c++}
+  return c/110;
+}
+
+/* ---------- 引用库 ---------- */
+const CITES={
+  "TPL-09":"审定模板库 TPL-09「前区满员提示」:后区广播'前区已满请勿前行'+ 引导屏切换 + 前区安保口头引导。人工预审通过,允许 L1 自动执行。",
+  "YA-2024-017":"《大型群众性活动安全预案》第17条:区域人群密度持续超过3人/㎡,应启动橙色预警并实施分流管制。",
+  "YA-2024-041":"《预案》第41条:高密度人群中发生医疗事件,应立即规划并开辟医疗通道,沿线观众配合侧移。",
+  "SOP-SS-01":"《演出暂停规程》(Show-Stop Protocol):前区密度突破红色阈值且截流无效时,应评估暂停或终止演出;暂停指令由现场指挥员会同演出方下达。",
+};
+const cite=id=>`<span class="cite" data-tip="${CITES[id]}">${id}</span>`;
+function entry(agent,cls,rows,extra){
+  const e=document.createElement("div");e.className="entry";
+  e.innerHTML=`<div class="ehd"><span class="badge ${cls}">${agent}</span><time>${fmtT(simT)}</time></div>
+    <div class="body">${rows.map(r=>`<div class="kv"><span class="k">${r[0]}</span><span class="v">${r[1]}</span></div>`).join("")}${extra||""}</div>`;
+  $("stream").appendChild(e);
+  requestAnimationFrame(()=>e.classList.add("show"));
+  $("stream").scrollTop=1e9;
+  return e;
+}
+function routeEntry(hard,llm,final){
+  entry("分级路由","b-route",[["机制","硬规则打底(仅观测量) + 研判建议;不一致取更高"]],
+    `<div class="routebar">
+      <span class="rb ${hard===final?'hit':''}">硬规则 ${hard}</span><span style="color:var(--dim)">vs</span>
+      <span class="rb ${llm===final?'hit':''}">研判 ${llm}</span><span style="color:var(--dim)">→</span>
+      <span class="rb hit" style="font-weight:700">定级 ${final}</span></div>`);
+}
+
+/* ---------- 剧情引擎 ---------- */
+let phase="idle",simT=0,expected=null,deviated=false;
+let showState="on"; // on | paused | ended
+let counts={L1:0,L2:0,L3:0};
+const hist=[];
+let consultQueue=[],consultTimer=0,pendingApprove=null,reported=false;
+let stretcher=null; // {phase:'in'|'dwell'|'out',t}
+let cordon=false;   // 修正处置的安保截流线
+let medStart=0,medDone=0;
+
+function setPhase(txt,cls){const el=$("phase");el.textContent=txt;el.className="chip "+(cls||"")}
+function banner(t,cls){const b=$("banner");if(!t){b.style.display="none";return}
+  b.textContent=t;b.className=cls;b.style.display="block"}
+function q(delay,fn){consultQueue.push([delay,fn])}
+function updateCounts(){$("sL").textContent=`${counts.L1}/${counts.L2}/${counts.L3}`}
+
+/* ===== 事件① L1:压轴预告 · 前区涌动 ===== */
+$("ev1").onclick=()=>{
+  $("ev1").disabled=true;$("ev1").classList.remove("ready");
+  let n=0;for(const a of agents){if(n<N*0.30){a.drive=1.0;n++}}
+  setPhase("L1 事件","auto");
+  banner("场内广播:压轴嘉宾即将登场 —— 前区观众开始向舞台涌动","teal");
+  q(4.5,()=>entry("态势感知","b-sit",[
+    ["判断",`前区密度升至 <b style="color:var(--amber)">${densityFront().toFixed(1)} 人/㎡</b>,趋势 rising,接近黄色阈值`],
+    ["依据","前区网格密度监测;未达橙色阈值 3.0;无伤情报告"]])),
+  q(2.4,()=>routeEntry("L1","L1","L1"));
+  q(1.4,()=>{entry("总指挥","b-cmd",[
+    ["结论",`匹配审定模板 ${cite("TPL-09")},参数化后<b style="color:var(--blue)">自动执行</b>,不打扰指挥员`],
+    ["约束","L1 仅限预审模板;LLM 自由生成内容一律 ≥ L2"],
+    ["留痕",`<span style="font-family:var(--mono);font-size:11px;color:var(--dim)">#LOG-${(Math.random()*9000+1000|0)} 已记录,可复盘</span>`]]);
+    // 模板执行:后区截流(远端观众停止前行)
+    for(const a of agents){const dd=Math.hypot(a.x-stage.x,a.y-stage.y);if(dd>140)a.drive=0.03}
+    banner("L1 自动处置:后区广播「前区已满」,截流生效","teal");
+    counts.L1++;updateCounts();
+    setTimeout(()=>{banner("");$("ev2").disabled=false;$("ev2").classList.add("ready");
+      setPhase("演出进行中","live")},3600);
+  });
+};
+
+/* ===== 事件② L2:前区医疗事件 → 开辟医疗通道 ===== */
+$("ev2").onclick=()=>{
+  $("ev2").disabled=true;$("ev2").classList.remove("ready");
+  medStart=simT;
+  banner("前区报告:第三排一名观众体力不支倒地,周边人墙密集","red");
+  setPhase("L2 事件","warn");
+  q(1.4,()=>entry("态势感知","b-sit",[
+    ["判断","前区事发点被高密度人墙包围,常规救护路线无法进入"],
+    ["依据","现场安保上报;事发点密度读数超 2.5"]])),
+  q(1.6,()=>{entry("风险研判","b-risk",[
+    ["判断","中等风险:单点伤情,但处置窗口敏感"],
+    ["依据",`${cite("YA-2024-041")} 高密度人群医疗事件条款`]]);
+    routeEntry("L2","L2","L2")});
+  q(1.8,()=>{entry("疏导策略","b-strat",[
+    ["判断","单方案:自南侧医疗点开辟楔形医疗通道,沿线观众侧移让行"],
+    ["依据","通道走廊路线由路径规划工具生成,避开最高密度核心"]],
+    `<div class="plancard rec"><div class="pn">方案 · 开辟医疗通道 <span class="tag">附推演</span></div>
+     <div class="pm">预计通道打开 <b>约 25 秒</b> · 担架往返 <b>约 60 秒</b> · 沿线约120名观众需短暂侧移</div></div>`)});
+  q(1.4,()=>{entry("总指挥","b-cmd",[
+    ["结论","L2 级别:方案待指挥员确认后执行"],
+    ["约束","超时不执行,仅持续告警 —— 医疗事件同步电话上报"]]);
+    pendingApprove="MED";
+    $("approveBtn").textContent="批准开辟通道";$("approvehint").textContent="L2 · 待指挥员确认";
+    $("approvewrap").style.display="flex"});
+};
+
+/* ===== 事件③ L3:密度破限 → 是否暂停演出 ===== */
+$("ev3").onclick=()=>{
+  $("ev3").disabled=true;$("ev3").classList.remove("ready");
+  let n=0;for(const a of agents){if(a.drive<0.5&&n<N*0.35){a.drive=1.0;n++}}
+  banner("警报:压轴登场,前涌未止 —— 前区密度即将突破红色阈值","red");
+  setPhase("L3 事件","warn");
+  q(4.5,()=>entry("态势感知","b-sit",[
+    ["判断",`前区密度 <b style="color:#ff9b9e">${densityFront().toFixed(1)} 人/㎡</b> 持续攀升,截流措施已不足以遏制`],
+    ["依据","密度增长率预测:按当前趋势数分钟内显著超限"]])),
+  q(2.2,()=>{entry("风险研判","b-risk",[
+    ["判断",`<b style="color:#ff9b9e">红色预警</b>:静态密度型风险(crush),历史同类事件伤亡最重的形态`],
+    ["依据",`${cite("YA-2024-017")};${cite("SOP-SS-01")} 演出暂停规程`]]);
+    routeEntry("L3","L3","L3")});
+  q(2.4,()=>{
+    const card=(name,key,rec,m1,m2,risk)=>`
+      <div class="plancard ${rec?'rec':''}" id="pc-${key}">
+        <div class="pn">${name} ${rec?'<span class="tag">推荐</span>':''}</div>
+        <canvas class="mini" id="mini-${key}"></canvas>
+        <div class="rollout" id="ro-${key}">并行推演中…</div>
+        <div class="pm" id="pm-${key}" style="display:none">${m1} · ${m2}<br><span class="risk">${risk}</span>
+          <div style="margin-top:6px"><button class="btn sm primary" onclick="choosePlan('${key}')">选择此方案</button></div></div>
+      </div>`;
+    entry("疏导策略","b-strat",[
+      ["判断","生成 3 套候选,提交数字城市并行推演"],
+      ["依据","动作来自审定动作集:截流 / 暂停演出 / 提前结束"]],
+      card("方案一 · 强化截流,演出继续","p1",false,"密度缓降","商业零损失","残余风险:回落慢,尾部超限概率 31%")+
+      card("方案二 · 暂停演出 5 分钟","p2",true,"密度确定回落","预计3分钟降至安全线","代价:观众情绪波动,演出延时")+
+      card("方案三 · 提前结束演出","p3",false,"密度回落最快","风险最低","代价:重大商业与舆情影响"));
+    runRollouts();
+  });
+};
+function runRollouts(){
+  const cfg={p1:{tau:55,c:"#8892a8"},p2:{tau:15,c:"#38c9a8"},p3:{tau:10,c:"#8892a8"}};
+  const d0=Math.max(3.2,densityFront());
+  const t0=performance.now();
+  function frame(ts){
+    const prog=Math.min(1,(ts-t0)/1700);
+    for(const k in cfg){
+      const cv=$("mini-"+k);if(!cv)continue;
+      const w=cv.clientWidth,h=cv.clientHeight;
+      if(cv.width!==w*devicePixelRatio){cv.width=w*devicePixelRatio;cv.height=h*devicePixelRatio;
+        cv.getContext("2d").setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0)}
+      const c=cv.getContext("2d");c.clearRect(0,0,w,h);
+      c.strokeStyle="rgba(229,72,77,.35)";c.setLineDash([2,3]);
+      const yThr=h-2-(3/6)*(h-6);
+      c.beginPath();c.moveTo(0,yThr);c.lineTo(w,yThr);c.stroke();c.setLineDash([]);
+      c.strokeStyle=cfg[k].c;c.lineWidth=1.5;c.beginPath();
+      const steps=60*prog;
+      for(let i=0;i<=steps;i++){
+        const t=i/60*130;
+        const d=Math.max(0.4,d0*Math.exp(-t/cfg[k].tau));
+        const x=i/60*w,y=h-2-(Math.min(d,6)/6)*(h-6);
+        i?c.lineTo(x,y):c.moveTo(x,y);
+      }
+      c.stroke();
+      const ro=$("ro-"+k);
+      if(ro)ro.textContent=prog<1?`并行推演中… ${Math.round(prog*100)}%`:"推演完成 · 扰动区间 ±12%";
+    }
+    if(prog<1)requestAnimationFrame(frame);
+    else{
+      for(const k of["p1","p2","p3"]){const pm=$("pm-"+k);if(pm)pm.style.display="block"}
+      entry("总指挥","b-cmd",[
+        ["结论",`推演对比完成。<b>安全 / 观演秩序 / 商业损失属三目标价值冲突,按裁决协议系统无权自决</b>`],
+        ["约束","L3 —— 请指挥员选择(前区密度仍在攀升)"]]);
+      setPhase("待指挥员选择","warn");
+    }
+  }
+  requestAnimationFrame(frame);
+}
+window.choosePlan=key=>{
+  document.querySelectorAll(".plancard .btn").forEach(b=>b.disabled=true);
+  const names={p1:"方案一(强化截流)",p2:"方案二(暂停演出5分钟)",p3:"方案三(提前结束)"};
+  if(key==="p1"){
+    for(const a of agents){const dd=Math.hypot(a.x-stage.x,a.y-stage.y);if(dd>120)a.drive=0.03}
+    expected={t0:simT,d0:densityFront(),tau:55};
+  }else if(key==="p2"){
+    showState="paused";$("sShow").textContent="已暂停";$("sShow").style.color="var(--amber)";
+    for(const a of agents)a.drive=0;
+    expected={t0:simT,d0:densityFront(),tau:15};
+    banner("演出暂停:舞台广播请观众后撤,灯光转为场灯","teal");
+  }else{
+    showState="ended";$("sShow").textContent="已结束";$("sShow").style.color="#ff9b9e";
+    for(const a of agents){a.drive=0;a.sp=0.8}
+    expected={t0:simT,d0:densityFront(),tau:10};
+    banner("演出提前结束:请观众有序退场","teal");
+  }
+  deviated=false;counts.L3++;updateCounts();
+  entry("总指挥","b-cmd",[["结论",`指挥员已选择${names[key]},指令下发(舞台控制/广播/安保同步);登记预期态势曲线`]]);
+  setPhase("处置执行中","live");
+  setTimeout(()=>{banner("")},3200);
+  setTimeout(()=>{if(!deviated)perturb()},8000);
+};
+
+/* ---------- L2/修正 批准 ---------- */
+$("approveBtn").onclick=()=>{
+  $("approvewrap").style.display="none";
+  if(pendingApprove==="MED"){
+    corridor={sx:aidStation.x,sy:aidStation.y,mx:medPoint.x,my:medPoint.y};
+    stretcher={phase:"in",t:0};
+    counts.L2++;updateCounts();
+    entry("总指挥","b-cmd",[["结论","指挥员已批准:医疗通道开辟中,沿线观众侧移,担架进入"]]);
+    banner("医疗通道开辟中 —— 沿线观众请侧移让行","teal");
+    setPhase("医疗处置中","live");
+  }else if(pendingApprove==="FIX"){
+    cordon=true;
+    for(const a of agents){a.comp=true;a.drive=0}
+    expected={t0:simT,d0:densityFront(),tau:12};
+    counts.L2++;updateCounts();
+    entry("总指挥","b-cmd",[["结论","修正方案已批准:安保截流线建立,广播强度上调,继续效果跟踪"]]);
+    banner("");setPhase("修正处置执行中","live");
+  }
+  pendingApprove=null;
+};
+$("rejectBtn").onclick=()=>{
+  entry("总指挥","b-cmd",[["结论","方案被驳回 —— 超时/驳回均不执行,维持告警等待新指令(演示请点批准继续)"]]);
+};
+
+/* ---------- 担架动画推进 ---------- */
+function stepStretcher(dt){
+  if(!stretcher)return;
+  if(stretcher.phase==="in"){stretcher.t+=dt/3.2;if(stretcher.t>=1){stretcher.phase="dwell";stretcher.t=0}}
+  else if(stretcher.phase==="dwell"){stretcher.t+=dt/2.2;if(stretcher.t>=1){stretcher.phase="out";stretcher.t=0}}
+  else{stretcher.t+=dt/3.2;
+    if(stretcher.t>=1){
+      stretcher=null;corridor=null;medDone=simT;
+      entry("评估复盘","b-cmd",[["结论",`伤员已转运至医疗点,通道恢复,用时 ${(medDone-medStart).toFixed(0)} 秒(含决策等待)`]]);
+      banner("");setPhase("演出进行中","live");
+      setTimeout(()=>{$("ev3").disabled=false;$("ev3").classList.add("ready")},2500);
+    }}
+}
+
+/* ---------- 扰动 → 滚动闭环 ---------- */
+function perturb(){
+  let n=0;const lim=200;
+  for(const a of agents){const dd=Math.hypot(a.x-stage.x,a.y-stage.y);
+    if(dd<200&&n<lim){a.comp=false;a.drive=1.0;n++}}
+  entry("态势感知","b-sit",[["判断","检测到现场扰动:前排约两百名观众未按指令后撤,仍在向前挤压"],["依据","效果跟踪比对进行中…"]]);
+}
+function reconsult(){
+  banner("⚠ 预期-实际偏差超阈值 —— 系统自动重新会商","red");
+  setPhase("滚动闭环 · 重会商","warn");
+  q(0.8,()=>entry("态势感知","b-sit",[
+    ["判断",`<b style="color:#ff9b9e">偏差告警</b>:实际密度超出预期曲线 35% 以上`],
+    ["依据","后撤服从率低于推演假设 —— <b>自动触发,无人工干预</b>"]])),
+  q(1.4,()=>{entry("疏导策略","b-strat",[
+    ["判断","修正:前区安保截流线建立(人链),广播强度上调,分排引导后撤"],
+    ["依据",cite("SOP-SS-01")]]);
+    routeEntry("L2","L2","L2")});
+  q(1.2,()=>{entry("总指挥","b-cmd",[["结论","修正方案按 L2 待批准执行"],["约束","超时不执行"]]);
+    pendingApprove="FIX";
+    $("approveBtn").textContent="批准修正方案";$("approvehint").textContent="L2 · 滚动闭环修正";
+    $("approvewrap").style.display="flex"});
+}
+
+/* ---------- 复盘 ---------- */
+function report(){
+  reported=true;
+  entry("评估复盘","b-cmd",[
+    ["结论",`处置完成:前区峰值密度 <b style="color:var(--teal)">${peakDen.toFixed(1)} 人/㎡</b>,已回落至安全区间`],
+    ["统计",`L1 自动处置 <b>${counts.L1}</b> 次 · L2 人机确认 <b>${counts.L2}</b> 次 · L3 推演决策 <b>${counts.L3}</b> 次 · 滚动闭环触发 <b>1</b> 次 · 演出暂停决策已留痕`],
+    ["依据","4 条预案/规程条文溯源;show-stop 决策链完整可回放"],
+    ["建议","「静态密度+医疗嵌套+暂停决策」复合场景已生成教学案例,存入案例库"]]);
+  setPhase("演示完成","live");banner("");
+  const b=document.createElement("button");b.className="btn";b.textContent="重置演示";
+  b.style.margin="4px 14px 14px";b.onclick=()=>location.reload();
+  $("log").appendChild(b);
+}
+
+/* ---------- 绘制 ---------- */
+function drawMap(){
+  const w=map.parentElement.clientWidth,h=map.parentElement.clientHeight;
+  mctx.clearRect(0,0,w,h);
+  mctx.fillStyle="#0a1524";mctx.fillRect(0,0,w,h);
+  mctx.strokeStyle="rgba(90,162,232,.05)";
+  for(let y=0;y<h;y+=26){mctx.beginPath();mctx.moveTo(0,y+Math.sin(y*.4+simT*.6)*3);
+    mctx.lineTo(w,y+Math.sin(y*.4+simT*.6+2)*3);mctx.stroke()}
+  mctx.save();mctx.translate(isl.cx,isl.cy);mctx.rotate(isl.rot);
+  mctx.beginPath();mctx.ellipse(0,0,isl.rw,isl.rh,0,0,Math.PI*2);
+  mctx.fillStyle="#16222f";mctx.fill();mctx.strokeStyle="#24374e";mctx.lineWidth=1.5;mctx.stroke();
+  mctx.restore();
+  // 高密度热区
+  const den=densityFront();
+  if(den>1.4){
+    const a=Math.min(.46,(den-1.4)*0.12);
+    const grd=mctx.createRadialGradient(front.x,front.y,8,front.x,front.y,front.r+14);
+    grd.addColorStop(0,`rgba(229,72,77,${a})`);grd.addColorStop(1,"rgba(229,72,77,0)");
+    mctx.fillStyle=grd;mctx.beginPath();
+    mctx.arc(front.x,front.y,front.r+14,0,Math.PI*2);mctx.fill()}
+  // 舞台与灯光
+  if(showState==="on"){
+    const g=mctx.createConicGradient?null:null;
+    for(let i=0;i<2;i++){
+      const ang=simT*0.8+i*Math.PI;
+      mctx.fillStyle="rgba(157,123,234,.06)";
+      mctx.beginPath();mctx.moveTo(stage.x+stage.w/2,stage.y);
+      mctx.arc(stage.x+stage.w/2,stage.y,240,ang-0.24,ang+0.24);mctx.closePath();mctx.fill();
+    }
+  }
+  mctx.fillStyle=showState==="on"?"#2a2440":"#1b2330";
+  mctx.strokeStyle=showState==="on"?"var(--violet)":"#2c3c52";
+  mctx.strokeStyle=showState==="on"?"#9d7bea":"#2c3c52";
+  mctx.beginPath();mctx.roundRect(stage.x-stage.w/2,stage.y-stage.h/2,stage.w,stage.h,6);
+  mctx.fill();mctx.lineWidth=1.5;mctx.stroke();
+  mctx.fillStyle=showState==="on"?"#c9b6f5":"#5a6a80";
+  mctx.font="11px sans-serif";mctx.textAlign="center";
+  mctx.save();mctx.translate(stage.x,stage.y);mctx.rotate(-Math.PI/2);
+  mctx.fillText(showState==="on"?"舞 台 · 演出中":showState==="paused"?"舞 台 · 已暂停":"舞 台 · 已结束",0,4);
+  mctx.restore();
+  // 医疗点
+  mctx.fillStyle="#38c9a8";mctx.beginPath();mctx.arc(aidStation.x,aidStation.y,6,0,Math.PI*2);mctx.fill();
+  mctx.fillStyle="#0a111c";mctx.font="bold 8px sans-serif";mctx.fillText("+",aidStation.x,aidStation.y+3);
+  mctx.fillStyle="rgba(56,201,168,.85)";mctx.font="10px sans-serif";
+  mctx.fillText("医疗点",aidStation.x,aidStation.y+18);
+  // 医疗通道
+  if(corridor){
+    mctx.strokeStyle="rgba(56,201,168,.4)";mctx.lineWidth=22;mctx.lineCap="round";
+    mctx.beginPath();mctx.moveTo(corridor.sx,corridor.sy);mctx.lineTo(corridor.mx,corridor.my);mctx.stroke();
+    mctx.lineWidth=1;
+  }
+  // 安保截流线(修正处置)
+  if(cordon){
+    mctx.strokeStyle="rgba(242,181,68,.7)";mctx.lineWidth=2.5;mctx.setLineDash([8,6]);
+    mctx.beginPath();mctx.arc(stage.x,stage.y,150,-1.1,1.1);mctx.stroke();mctx.setLineDash([]);
+    mctx.fillStyle="rgba(242,181,68,.85)";mctx.font="10px sans-serif";
+    mctx.fillText("安保截流线",stage.x+165,stage.y-120);
+  }
+  // 人群
+  for(const a of agents){
+    mctx.fillStyle=(!a.comp&&a.drive>0.5)?"rgba(255,140,120,.92)":"rgba(232,217,168,.85)";
+    mctx.fillRect(a.x-1.3,a.y-1.3,2.6,2.6);
+  }
+  // 事发点与担架
+  if(stretcher){
+    mctx.fillStyle="#ff9b9e";mctx.beginPath();mctx.arc(medPoint.x,medPoint.y,4,0,Math.PI*2);mctx.fill();
+    let t=stretcher.t,px,py;
+    if(stretcher.phase==="in"){px=aidStation.x+(medPoint.x-aidStation.x)*t;py=aidStation.y+(medPoint.y-aidStation.y)*t}
+    else if(stretcher.phase==="dwell"){px=medPoint.x;py=medPoint.y}
+    else{px=medPoint.x+(aidStation.x-medPoint.x)*t;py=medPoint.y+(aidStation.y-medPoint.y)*t}
+    mctx.fillStyle="#ffffff";mctx.beginPath();mctx.arc(px,py,5,0,Math.PI*2);mctx.fill();
+    mctx.strokeStyle="#e5484d";mctx.lineWidth=1.6;
+    mctx.beginPath();mctx.moveTo(px-3,py);mctx.lineTo(px+3,py);mctx.moveTo(px,py-3);mctx.lineTo(px,py+3);mctx.stroke();
+  }
+  mctx.fillStyle="rgba(90,162,232,.4)";mctx.font="10px sans-serif";mctx.textAlign="left";
+  mctx.fillText("黄浦江 · 复兴岛船台公园",18,26);
+}
+function drawChart(){
+  const w=chart.parentElement.clientWidth-16,h=chart.parentElement.clientHeight-14;
+  cctx.clearRect(0,0,w+16,h+14);
+  const maxT=Math.max(60,simT),maxD=6;
+  const X=t=>10+(t/maxT)*(w-16),Y=d=>h-4-(Math.min(d,maxD)/maxD)*(h-22);
+  cctx.strokeStyle="#1e2d42";cctx.lineWidth=1;
+  cctx.beginPath();cctx.moveTo(10,Y(1.5));cctx.lineTo(w,Y(1.5));cctx.stroke();
+  cctx.fillStyle="#4a5a70";cctx.font="9px monospace";cctx.fillText("1.5",0,Y(1.5)+3);
+  cctx.strokeStyle="rgba(229,72,77,.4)";cctx.setLineDash([2,3]);
+  cctx.beginPath();cctx.moveTo(10,Y(3));cctx.lineTo(w,Y(3));cctx.stroke();cctx.setLineDash([]);
+  cctx.fillStyle="rgba(229,72,77,.7)";cctx.fillText("3.0",0,Y(3)+3);
+  if(expected){cctx.strokeStyle="rgba(56,201,168,.8)";cctx.setLineDash([5,4]);cctx.beginPath();
+    for(let t=expected.t0;t<=simT+20;t+=1){
+      const d=Math.max(0.4,expected.d0*Math.exp(-(t-expected.t0)/expected.tau));
+      const x=X(t);if(t===expected.t0)cctx.moveTo(x,Y(d));else cctx.lineTo(x,Y(d))}
+    cctx.stroke();cctx.setLineDash([])}
+  cctx.strokeStyle="#e8d9a8";cctx.lineWidth=1.6;cctx.beginPath();
+  hist.forEach((p,i)=>{const x=X(p[0]),y=Y(p[1]);i?cctx.lineTo(x,y):cctx.moveTo(x,y)});
+  cctx.stroke();
+}
+
+/* ---------- 主循环 ---------- */
+let last=0,running=false;
+function loop(ts){
+  const dt=Math.min(0.05,(ts-last)/1000);last=ts;
+  if(running){
+    simT+=dt;stepSim(dt);stepStretcher(dt);
+    const den=densityFront();peakDen=Math.max(peakDen,den);
+    if((simT*10|0)%3===0)hist.push([simT,den]);
+    if(consultQueue.length){
+      consultTimer+=dt;
+      if(consultTimer>=consultQueue[0][0]){consultTimer=0;consultQueue.shift()[1]()}
+    }
+    if(expected&&!deviated&&simT>expected.t0+6){
+      const exp=Math.max(0.4,expected.d0*Math.exp(-(simT-expected.t0)/expected.tau));
+      if(den>exp*1.35&&den>1.5){deviated=true;expected=null;reconsult()}
+    }
+    if(!reported&&counts.L3>0&&cordon&&densityFront()<1.5&&simT>20)report();
+    $("sDen").textContent=den.toFixed(1);
+    $("sDen").className="n "+(den>3?"bad":den>1.8?"":"good");
+    $("sPeak").textContent=peakDen.toFixed(1);
+    $("clock").textContent=fmtT(simT);
+  }
+  drawMap();drawChart();
+  requestAnimationFrame(loop);
+}
+function fmtT(t){const m=(t/60)|0,s=(t%60)|0;return`T+${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`}
+
+$("startBtn").onclick=()=>{
+  $("overlay").style.display="none";
+  spawn();running=true;setPhase("演出进行中","live");
+  entry("态势感知","b-sit",[["判断","演出进行中,约1,100名观众聚集舞台前,前区隔离带正常"],["依据","仿真态势 Schema · tick 0"]]);
+  setTimeout(()=>{$("ev1").disabled=false;$("ev1").classList.add("ready")},7000);
+};
+resize();spawn();requestAnimationFrame(loop);
+</script>
+</body>
+</html>

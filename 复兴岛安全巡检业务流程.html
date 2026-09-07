@@ -1,0 +1,260 @@
+<meta charset="utf-8">
+<title>安全巡检业务流程</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #F3EEE3;
+    --surface: #FFFFFF;
+    --surface-alt: #EAE2D0;
+    --ink: #1E2A2E;
+    --ink-muted: #5C6B70;
+    --accent: #1F6E7A;
+    --accent-strong: #123F47;
+    --accent-soft: #D7E7E4;
+    --warn: #A85A18;
+    --warn-soft: #F1DFC5;
+    --line: rgba(30, 42, 46, 0.15);
+    --line-strong: rgba(30, 42, 46, 0.28);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #11181A; --surface: #1A2325; --surface-alt: #202B2C;
+      --ink: #E9EEEA; --ink-muted: #9BA9A8;
+      --accent: #63BCC5; --accent-strong: #96D6DC; --accent-soft: rgba(99, 188, 197, 0.16);
+      --warn: #E3A25C; --warn-soft: rgba(227, 162, 92, 0.14);
+      --line: rgba(233, 238, 234, 0.14); --line-strong: rgba(233, 238, 234, 0.26);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #11181A; --surface: #1A2325; --surface-alt: #202B2C;
+    --ink: #E9EEEA; --ink-muted: #9BA9A8;
+    --accent: #63BCC5; --accent-strong: #96D6DC; --accent-soft: rgba(99, 188, 197, 0.16);
+    --warn: #E3A25C; --warn-soft: rgba(227, 162, 92, 0.14);
+    --line: rgba(233, 238, 234, 0.14); --line-strong: rgba(233, 238, 234, 0.26);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    line-height: 1.7; -webkit-font-smoothing: antialiased;
+    max-width: 100%; overflow-x: hidden;
+  }
+  h1, h2, .display { font-family: "Noto Serif SC", "Songti SC", serif; font-weight: 800; text-wrap: balance; }
+  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+
+  .wrap { max-width: 900px; margin: 0 auto; padding: 0 24px; }
+  .col { max-width: 700px; }
+
+  header.hero { padding: 56px 0 36px; border-bottom: 1px solid var(--line); }
+  .eyebrow {
+    font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
+  }
+  header.hero h1 { font-size: clamp(24px, 3.6vw, 32px); line-height: 1.35; margin: 0 0 16px; }
+  header.hero p { font-size: 15.5px; color: var(--ink-muted); margin: 0; }
+
+  section { padding: 48px 0; border-bottom: 1px solid var(--line); }
+  section:last-of-type { border-bottom: none; }
+  .section-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+  .section-num {
+    font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--accent);
+    border: 1px solid var(--line-strong); border-radius: 999px; padding: 3px 10px;
+  }
+  h2 { font-size: 21px; margin: 0; }
+  .section-sub { color: var(--ink-muted); font-size: 14px; margin: 10px 0 24px; max-width: 640px; }
+
+  /* Legend */
+  .legend {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 10px 20px; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 12px; padding: 18px 20px; margin-bottom: 8px; font-size: 13px;
+  }
+  .legend .row { display: flex; align-items: center; gap: 9px; }
+  .legend .swatch { width: 22px; height: 14px; border-radius: 3px; flex: none; }
+  .sw-sys { background: var(--surface); border: 1.3px solid var(--ink); }
+  .sw-device { background: var(--surface); border: 1.3px dashed var(--ink); }
+  .sw-ai { background: var(--accent-soft); border: 1.3px solid var(--accent); }
+  .sw-human { background: var(--accent-soft); border: 2.2px solid var(--accent-strong); }
+  .sw-end { background: var(--surface-alt); border: 1.3px dashed var(--ink-muted); }
+  .sw-warn { background: var(--warn-soft); border: 1.3px solid var(--warn); }
+
+  figure.diagram {
+    margin: 0; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 14px; padding: 22px 10px 14px; color: var(--ink);
+  }
+  figure.diagram svg { display: block; width: 100%; height: auto; overflow: visible; }
+  figure.diagram figcaption { font-size: 13px; color: var(--ink-muted); text-align: center; padding: 14px 20px 4px; }
+  .diagram-scroll { overflow-x: auto; }
+
+  .dg-box { fill: var(--surface); stroke: currentColor; stroke-width: 1.3; }
+  .dg-device { stroke-dasharray: 3 3; }
+  .dg-ai { fill: var(--accent-soft); stroke: var(--accent); }
+  .dg-human { fill: var(--accent-soft); stroke: var(--accent-strong); stroke-width: 2.4; }
+  .dg-end-neutral { fill: var(--surface-alt); stroke: var(--ink-muted); stroke-dasharray: 3 3; }
+  .dg-end-warn { fill: var(--warn-soft); stroke: var(--warn); stroke-width: 1.6; }
+  .dg-diamond { fill: var(--surface); stroke: currentColor; stroke-width: 1.3; }
+  .dg-tag { font-family: "JetBrains Mono", monospace; font-size: 10.2px; fill: var(--ink-muted); }
+  .dg-label { font-family: "Noto Sans SC", sans-serif; font-size: 12.6px; fill: currentColor; }
+  .dg-human-tag { fill: var(--accent-strong); font-weight: 700; }
+  .dg-human-label { fill: var(--accent-strong); font-weight: 600; }
+  .dg-branch { font-family: "JetBrains Mono", monospace; font-size: 11px; fill: var(--ink-muted); }
+  .dg-diamond-label { font-family: "Noto Sans SC", sans-serif; font-size: 13px; fill: currentColor; font-weight: 600; }
+  .dg-arrow { stroke: currentColor; stroke-width: 1.4; fill: none; }
+
+  .takeaway {
+    border-left: 3px solid var(--accent); padding: 4px 0 4px 16px;
+    font-size: 14px; margin-top: 20px; color: var(--ink);
+  }
+
+  .closing {
+    background: var(--accent-soft); border: 1px solid var(--line);
+    border-radius: 12px; padding: 20px 24px; font-size: 14.5px;
+  }
+  .closing strong { color: var(--accent-strong); }
+
+  footer { padding: 36px 24px 60px; text-align: center; color: var(--ink-muted); font-size: 12.5px; }
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">复兴岛应急孪生 MVP · 优先场景</div>
+    <h1>常态化安全巡检——从触发到闭环的完整业务流程</h1>
+    <p class="col">MVP 优先级最高的场景。这张图标出哪一步系统自动完成、哪一步是 AI 给建议、哪一步必须现场人员签字确认——这也是六级人机权限里"止步于协作"的具体样子。</p>
+  </header>
+
+  <section>
+    <div class="legend">
+      <div class="row"><span class="swatch sw-sys"></span>系统自动步骤</div>
+      <div class="row"><span class="swatch sw-device"></span>设备/人工执行</div>
+      <div class="row"><span class="swatch sw-ai"></span>AI 生成建议</div>
+      <div class="row"><span class="swatch sw-human"></span>人工确认 · 必须</div>
+      <div class="row"><span class="swatch sw-end"></span>分支结束 · 正常</div>
+      <div class="row"><span class="swatch sw-warn"></span>分支结束 · 升级处置</div>
+    </div>
+  </section>
+
+  <section id="scenario-a">
+    <div class="section-head"><span class="section-num">场景一</span><h2>常态化安全巡检</h2></div>
+    <p class="section-sub">舞台、临建设施、消防设施、疏散通道的日常巡检 —— MVP 第一优先级，数据最容易获取、行动风险最低。</p>
+
+    <div class="diagram-scroll">
+    <figure class="diagram">
+      <svg viewBox="0 0 620 1168" role="img" aria-label="安全巡检业务流程：系统下发任务，设备巡检采集数据，AI识别异常后进入疑似隐患判断；若非隐患则归档结束，若是则交现场负责人人工复核；复核确认后派发整改任务，责任单位整改反馈，最终复检确认是否已解决；已解决则归档进经验库，逾期未解决则升级处置">
+        <defs>
+          <marker id="arrowA" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="currentColor"></path>
+          </marker>
+        </defs>
+
+        <!-- B1 -->
+        <rect class="dg-box" x="70" y="20" width="260" height="68" rx="9"></rect>
+        <text x="200" y="42" text-anchor="middle" class="dg-tag">系统</text>
+        <text x="200" y="62" text-anchor="middle" class="dg-label">按巡检计划下发任务</text>
+        <path class="dg-arrow" marker-end="url(#arrowA)" d="M200,88 L200,118"></path>
+
+        <!-- B2 device -->
+        <rect class="dg-box dg-device" x="70" y="120" width="260" height="68" rx="9"></rect>
+        <text x="200" y="142" text-anchor="middle" class="dg-tag">设备执行</text>
+        <text x="200" y="160" text-anchor="middle" class="dg-label">无人机 / 机器人 / 人工</text>
+        <text x="200" y="176" text-anchor="middle" class="dg-label">现场采集数据</text>
+        <path class="dg-arrow" marker-end="url(#arrowA)" d="M200,188 L200,218"></path>
+
+        <!-- B3 AI -->
+        <rect class="dg-box dg-ai" x="70" y="220" width="260" height="68" rx="9"></rect>
+        <text x="200" y="242" text-anchor="middle" class="dg-tag">AI</text>
+        <text x="200" y="262" text-anchor="middle" class="dg-label">比对基线状态</text>
+        <text x="200" y="278" text-anchor="middle" class="dg-label">识别异常</text>
+        <path class="dg-arrow" marker-end="url(#arrowA)" d="M200,288 L200,318"></path>
+
+        <!-- D1 diamond center 364 -->
+        <polygon class="dg-diamond" points="200,320 310,364 200,408 90,364"></polygon>
+        <text x="200" y="369" text-anchor="middle" class="dg-diamond-label">疑似隐患？</text>
+        <path class="dg-arrow" marker-end="url(#arrowA)" d="M200,408 L200,438"></path>
+        <text x="215" y="428" class="dg-branch">是</text>
+        <path class="dg-arrow" marker-end="url(#arrowA)" d="M310,364 L378,364"></path>
+        <text x="330" y="356" class="dg-branch">否</text>
+
+        <!-- S1 end neutral -->
+        <rect class="dg-end-neutral" x="380" y="330" width="200" height="68" rx="9"></rect>
+        <text x="480" y="352" text-anchor="middle" class="dg-tag">系统</text>
+        <text x="480" y="372" text-anchor="middle" class="dg-label">标记"已巡检-正常"</text>
+        <text x="480" y="388" text-anchor="middle" class="dg-label">并归档（流程结束）</text>
+
+        <!-- B5 -->
+        <rect class="dg-box" x="70" y="440" width="260" height="68" rx="9"></rect>
+        <text x="200" y="462" text-anchor="middle" class="dg-tag">系统 · AI</text>
+        <text x="200" y="480" text-anchor="middle" class="dg-label">生成工单并标注风险等级</text>
+        <text x="200" y="496" text-anchor="middle" class="dg-label">推送现场负责人</text>
+        <path class="dg-arrow" marker-end="url(#arrowA)" d="M200,508 L200,538"></path>
+
+        <!-- B6 human gate -->
+        <rect class="dg-box dg-human" x="70" y="540" width="260" height="68" rx="9"></rect>
+        <text x="200" y="564" text-anchor="middle" class="dg-tag dg-human-tag">人工确认 · 必须</text>
+        <text x="200" y="586" text-anchor="middle" class="dg-label dg-human-label">现场负责人人工复核</text>
+        <path class="dg-arrow" marker-end="url(#arrowA)" d="M200,608 L200,638"></path>
+
+        <!-- D2 diamond center 684 -->
+        <polygon class="dg-diamond" points="200,640 310,684 200,728 90,684"></polygon>
+        <text x="200" y="689" text-anchor="middle" class="dg-diamond-label">确认为真实隐患？</text>
+        <path class="dg-arrow" marker-end="url(#arrowA)" d="M200,728 L200,758"></path>
+        <text x="215" y="748" class="dg-branch">是</text>
+        <path class="dg-arrow" marker-end="url(#arrowA)" d="M310,684 L378,684"></path>
+        <text x="330" y="676" class="dg-branch">否</text>
+
+        <!-- S2 end neutral -->
+        <rect class="dg-end-neutral" x="380" y="650" width="200" height="68" rx="9"></rect>
+        <text x="480" y="672" text-anchor="middle" class="dg-tag">系统</text>
+        <text x="480" y="692" text-anchor="middle" class="dg-label">记为误报样本</text>
+        <text x="480" y="708" text-anchor="middle" class="dg-label">回写优化识别（结束）</text>
+
+        <!-- B8 -->
+        <rect class="dg-box" x="70" y="760" width="260" height="68" rx="9"></rect>
+        <text x="200" y="782" text-anchor="middle" class="dg-tag">系统</text>
+        <text x="200" y="800" text-anchor="middle" class="dg-label">派发整改任务</text>
+        <text x="200" y="816" text-anchor="middle" class="dg-label">并设定整改期限</text>
+        <path class="dg-arrow" marker-end="url(#arrowA)" d="M200,828 L200,858"></path>
+
+        <!-- B9 -->
+        <rect class="dg-box dg-device" x="70" y="860" width="260" height="68" rx="9"></rect>
+        <text x="200" y="882" text-anchor="middle" class="dg-tag">责任单位</text>
+        <text x="200" y="902" text-anchor="middle" class="dg-label">整改并反馈完成</text>
+        <path class="dg-arrow" marker-end="url(#arrowA)" d="M200,928 L200,958"></path>
+
+        <!-- D3 diamond center 1004 -->
+        <polygon class="dg-diamond" points="200,960 310,1004 200,1048 90,1004"></polygon>
+        <text x="200" y="1009" text-anchor="middle" class="dg-diamond-label">复检确认已解决？</text>
+        <path class="dg-arrow" marker-end="url(#arrowA)" d="M200,1048 L200,1078"></path>
+        <text x="215" y="1068" class="dg-branch">是</text>
+        <path class="dg-arrow" marker-end="url(#arrowA)" d="M310,1004 L378,1004"></path>
+        <text x="330" y="996" class="dg-branch">否</text>
+
+        <!-- S3 end warn -->
+        <rect class="dg-end-warn" x="380" y="970" width="200" height="68" rx="9"></rect>
+        <text x="480" y="992" text-anchor="middle" class="dg-tag">升级处置</text>
+        <text x="480" y="1012" text-anchor="middle" class="dg-label">转交现场指挥</text>
+        <text x="480" y="1028" text-anchor="middle" class="dg-label">升级处置（结束）</text>
+
+        <!-- BF -->
+        <rect class="dg-box" x="70" y="1080" width="260" height="68" rx="9"></rect>
+        <text x="200" y="1102" text-anchor="middle" class="dg-tag">经验库</text>
+        <text x="200" y="1120" text-anchor="middle" class="dg-label">状态归"已闭环"</text>
+        <text x="200" y="1136" text-anchor="middle" class="dg-label">沉淀为典型隐患案例</text>
+      </svg>
+      <figcaption>三处分支只有一处会离开常规闭环——复检超期未解决时升级给现场指挥；其余两处分支都是正常结束（确认无隐患 / 确认为误报）。</figcaption>
+    </figure>
+    </div>
+    <div class="takeaway">全程只有一道强制人工关卡：现场负责人复核。AI 只做"发现异常、生成工单"，是否真的整改、何时闭环，始终是人说了算。</div>
+  </section>
+
+  <section>
+    <div class="closing">
+      <strong>这套骨架可复用：</strong>"系统感知 → AI 给方案 → 人工确认 → 设备/人工执行 → 状态回传 → 复盘归档"六步节奏，在关键动作前设人工关卡，结果最终写回同一个共享经验库——这正是"共享底座"设计要保证的：换一个场景，流程骨架不用重建，只是换判断条件和执行方式。
+    </div>
+  </section>
+
+  <footer>复兴岛应急孪生 MVP · 安全巡检业务流程</footer>
+</div>

@@ -1,0 +1,254 @@
+<meta charset="utf-8">
+<title>最小可行的第一步</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #F3EEE3; --surface: #FFFFFF; --surface-alt: #EAE2D0;
+    --ink: #1E2A2E; --ink-muted: #5C6B70;
+    --accent: #1F6E7A; --accent-strong: #123F47; --accent-soft: #D7E7E4;
+    --warn: #A85A18; --warn-soft: #F1DFC5;
+    --line: rgba(30, 42, 46, 0.15); --line-strong: rgba(30, 42, 46, 0.28);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #11181A; --surface: #1A2325; --surface-alt: #202B2C;
+      --ink: #E9EEEA; --ink-muted: #9BA9A8;
+      --accent: #63BCC5; --accent-strong: #96D6DC; --accent-soft: rgba(99,188,197,0.16);
+      --warn: #E3A25C; --warn-soft: rgba(227,162,92,0.14);
+      --line: rgba(233,238,234,0.14); --line-strong: rgba(233,238,234,0.26);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #11181A; --surface: #1A2325; --surface-alt: #202B2C;
+    --ink: #E9EEEA; --ink-muted: #9BA9A8;
+    --accent: #63BCC5; --accent-strong: #96D6DC; --accent-soft: rgba(99,188,197,0.16);
+    --warn: #E3A25C; --warn-soft: rgba(227,162,92,0.14);
+    --line: rgba(233,238,234,0.14); --line-strong: rgba(233,238,234,0.26);
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    line-height: 1.75; -webkit-font-smoothing: antialiased;
+    max-width: 100%; overflow-x: hidden;
+  }
+  h1, h2, h3 { font-family: "Noto Serif SC", "Songti SC", serif; font-weight: 800; text-wrap: balance; }
+  .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+
+  header.hero { padding: 60px 0 32px; border-bottom: 1px solid var(--line); }
+  .eyebrow {
+    font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 14px;
+  }
+  header.hero h1 { font-size: clamp(26px, 4vw, 36px); line-height: 1.35; margin: 0 0 18px; }
+  header.hero p { font-size: 16px; color: var(--ink-muted); margin: 0; max-width: 620px; }
+
+  section { padding: 44px 0; border-bottom: 1px solid var(--line); }
+  section:last-of-type { border-bottom: none; }
+  h2 { font-size: 22px; margin: 0 0 14px; }
+  p { margin: 0 0 14px; }
+  .lead { font-size: 16px; }
+  strong.hl { color: var(--accent-strong); }
+
+  .analogy {
+    background: var(--accent-soft); border-radius: 12px; padding: 20px 24px;
+    font-size: 15px; margin: 18px 0;
+  }
+  .analogy b { color: var(--accent-strong); }
+
+  .term-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
+  @media (max-width: 640px) { .term-grid { grid-template-columns: 1fr; } }
+  .term-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+  }
+  .term-card .jargon { font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--ink-muted); margin-bottom: 6px; }
+  .term-card .plain { font-size: 14px; }
+
+  .steps { counter-reset: step; display: flex; flex-direction: column; gap: 2px; margin: 20px 0; }
+  .step {
+    display: flex; gap: 16px; align-items: flex-start;
+    background: var(--surface); border: 1px solid var(--line); padding: 16px 18px;
+  }
+  .step:first-child { border-radius: 12px 12px 0 0; }
+  .step:last-child { border-radius: 0 0 12px 12px; }
+  .step + .step { border-top: none; }
+  .step .num {
+    counter-increment: step; flex: none;
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--accent); color: var(--surface);
+    display: flex; align-items: center; justify-content: center;
+    font-family: "JetBrains Mono", monospace; font-weight: 600; font-size: 14px;
+  }
+  .step .num::before { content: counter(step); }
+  .step .body b { display: block; margin-bottom: 3px; }
+  .step .body span { color: var(--ink-muted); font-size: 13.5px; }
+  .step.gate { background: var(--accent-soft); }
+  .step.gate .num { background: var(--accent-strong); }
+
+  .diagram-scroll { overflow-x: auto; margin: 20px 0; }
+  figure.diagram {
+    margin: 0; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 14px; padding: 20px 10px 10px; color: var(--ink);
+  }
+  figure.diagram svg { display: block; width: 100%; height: auto; overflow: visible; }
+  figure.diagram figcaption { font-size: 12.5px; color: var(--ink-muted); text-align: center; padding: 12px 16px 2px; }
+
+  .not-doing {
+    background: var(--warn-soft); border: 1px solid color-mix(in srgb, var(--warn) 45%, transparent);
+    border-radius: 12px; padding: 20px 24px; margin: 20px 0;
+  }
+  .not-doing .head { color: var(--warn); font-weight: 700; font-size: 14px; margin-bottom: 10px; }
+  .not-doing ul { margin: 0; padding-left: 20px; }
+  .not-doing li { margin-bottom: 6px; font-size: 14px; }
+
+  .why {
+    border-left: 3px solid var(--accent); padding: 2px 0 2px 16px; font-size: 14.5px; margin: 18px 0;
+  }
+
+  .closing {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 22px 24px; font-size: 14.5px;
+  }
+  .closing a { color: var(--accent); }
+
+  footer { padding: 36px 24px 60px; text-align: center; color: var(--ink-muted); font-size: 12.5px; }
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">复兴岛应急平台 · 写给要动手做的人</div>
+    <h1>不用先把整套架构做完，只需要跑通六步</h1>
+    <p class="lead">完整需求文档里的"本体""Agentic""行动网关""六层架构""二十条验收标准"，描述的是这个项目三到五年能长成的样子。现在要做的第一版，其实很简单——去掉术语之后就是六个步骤。</p>
+  </header>
+
+  <section>
+    <h2>先把三个吓人的词换成大白话</h2>
+    <p>不是说这些词不对，而是它们描述的是"这套机制以后要具备的能力"，不是"你现在要写的代码"。对照着看：</p>
+    <div class="term-grid">
+      <div class="term-card">
+        <div class="jargon">Ontology / 本体</div>
+        <div class="plain">说白了就是几张互相关联、编号统一的表格——"东通道"在地图上、在任务里、在报告里说的是同一件事，不是三份对不上的记录。</div>
+      </div>
+      <div class="term-card">
+        <div class="jargon">Agentic / 智能体</div>
+        <div class="plain">就是一个会先查表、再给建议的 AI。它只负责说"我建议这么做"，不负责自己动手。</div>
+      </div>
+      <div class="term-card">
+        <div class="jargon">行动网关</div>
+        <div class="plain">说白了就一条规则：AI 的建议，必须有一个人点"确认"，系统才真的往下走。</div>
+      </div>
+    </div>
+    <div class="analogy">延续之前的比方：<b>本体是病历本，AI 是给建议的值班医生，行动网关是"医嘱必须有医生签字才生效"这条院规。</b>第一版要做的，就是让这一本病历、一个医生、一条院规先跑起来，不需要一开始就配齐专家会诊、住院医培训和病历质控科。</div>
+  </section>
+
+  <section>
+    <h2>最小可行版本：六步，而不是六层架构</h2>
+    <p>就用文档里那个"东侧通道堵了"的演示场景，走一遍最短路径：</p>
+    <div class="steps">
+      <div class="step">
+        <span class="num"></span>
+        <div class="body"><b>东通道报堵，系统记一笔</b><span>不管消息是文字、表单还是人工电话转述，先落成一条"事件"记录，带时间和来源。</span></div>
+      </div>
+      <div class="step">
+        <span class="num"></span>
+        <div class="body"><b>AI 查表：北通道能不能走、谁能带路</b><span>查的是那几张编号统一的表——通道表、人员表——不是翻聊天记录猜。</span></div>
+      </div>
+      <div class="step">
+        <span class="num"></span>
+        <div class="body"><b>AI 给建议："走北通道，需要引导员 G1"</b><span>只是一条建议，附带"为什么"：北通道核查有效、G1 现在没别的任务。</span></div>
+      </div>
+      <div class="step gate">
+        <span class="num"></span>
+        <div class="body"><b>现场负责人点"批准"</b><span>这一步是唯一的强制人工关卡——AI 不能替这一步做决定。</span></div>
+      </div>
+      <div class="step">
+        <span class="num"></span>
+        <div class="body"><b>系统生成任务卡，发给 G1</b><span>任务卡上写清楚是谁批准的、依据是什么，不是一句口头通知。</span></div>
+      </div>
+      <div class="step">
+        <span class="num"></span>
+        <div class="body"><b>G1 完成后勾"已完成"，系统自动生成一份复盘</b><span>不需要人工再整理一遍时间线，运行记录本身就是复盘草稿。</span></div>
+      </div>
+    </div>
+
+    <div class="diagram-scroll">
+      <figure class="diagram">
+        <svg viewBox="0 0 900 190" role="img" aria-label="最小闭环六步：事件上报到系统，AI查表生成建议，现场负责人人工确认，系统派发任务卡，执行人完成并回执，系统自动生成复盘">
+          <defs>
+            <marker id="arrowS" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="currentColor"></path>
+            </marker>
+          </defs>
+          <g font-family="Noto Sans SC, sans-serif" font-size="12.5" text-anchor="middle">
+            <rect x="10" y="60" width="130" height="60" rx="9" fill="none" stroke="currentColor" stroke-width="1.3"></rect>
+            <text x="75" y="85" fill="currentColor">事件上报</text>
+            <text x="75" y="103" fill="currentColor">东通道堵了</text>
+
+            <rect x="160" y="60" width="130" height="60" rx="9" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.3"></rect>
+            <text x="225" y="85" fill="currentColor">AI 查表</text>
+            <text x="225" y="103" fill="currentColor">给出建议</text>
+
+            <rect x="310" y="52" width="140" height="76" rx="9" fill="var(--accent-soft)" stroke="var(--accent-strong)" stroke-width="2.2"></rect>
+            <text x="380" y="80" fill="var(--accent-strong)" font-weight="700">人工确认</text>
+            <text x="380" y="98" fill="var(--accent-strong)" font-weight="700">必须</text>
+            <text x="380" y="116" font-family="JetBrains Mono, monospace" font-size="10.5" fill="var(--accent-strong)">唯一强制关卡</text>
+
+            <rect x="470" y="60" width="130" height="60" rx="9" fill="none" stroke="currentColor" stroke-width="1.3" stroke-dasharray="3 3"></rect>
+            <text x="535" y="85" fill="currentColor">生成任务卡</text>
+            <text x="535" y="103" fill="currentColor">发给执行人</text>
+
+            <rect x="620" y="60" width="130" height="60" rx="9" fill="none" stroke="currentColor" stroke-width="1.3" stroke-dasharray="3 3"></rect>
+            <text x="685" y="85" fill="currentColor">完成并回执</text>
+            <text x="685" y="103" fill="currentColor">勾选已完成</text>
+
+            <rect x="770" y="60" width="120" height="60" rx="9" fill="none" stroke="currentColor" stroke-width="1.3"></rect>
+            <text x="830" y="85" fill="currentColor">自动生成</text>
+            <text x="830" y="103" fill="currentColor">复盘草稿</text>
+          </g>
+          <g stroke="currentColor" stroke-width="1.4" marker-end="url(#arrowS)">
+            <line x1="140" y1="90" x2="158" y2="90"></line>
+            <line x1="290" y1="90" x2="308" y2="90"></line>
+            <line x1="450" y1="90" x2="468" y2="90"></line>
+            <line x1="600" y1="90" x2="618" y2="90"></line>
+            <line x1="750" y1="90" x2="768" y2="90"></line>
+          </g>
+        </svg>
+        <figcaption>六个方框对应六步。虚线框是"照做就行"的执行动作，实线框是系统查表和自动生成，加粗的那一格是唯一必须人来点头的地方。</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <h2>这一版先不做的事</h2>
+    <p>完整需求文档里几乎每一节都在描述"以后要补的能力"。第一版明确不碰，免得还没跑通一遍就想着面面俱到：</p>
+    <div class="not-doing">
+      <div class="head">先放一放，等最小闭环跑顺了再加</div>
+      <ul>
+        <li>第二个 AI 互相审查方案（"方案审查 Agent"）——先一个 AI 给建议就够</li>
+        <li>自动检测人员/资源冲突（比如同一个引导员被派了两个任务）——第一版靠人工看出来</li>
+        <li>处置没效果时自动触发重新研判——第一版靠人工发现问题、手动重来一次</li>
+        <li>教师配置场景、学生分组隔离的教学实验环境——先让一个人跑通一遍演示</li>
+        <li>第二个场景（舞台/临建设施巡检）——先把"东通道堵了"这一个场景做扎实</li>
+      </ul>
+    </div>
+    <div class="why">这五件事文档里都写了，也都有价值，但没有一件是"证明这套思路能不能成立"所必需的——先把六步跑通一遍，比同时开五条线更快看到结果。</div>
+  </section>
+
+  <section>
+    <h2>为什么做这么少也算数</h2>
+    <p>因为这六步已经验证了整套思路里最核心的主张：<strong class="hl">同一份数据被所有人共用（不是三份对不上的记录），AI 只给建议不擅自行动，关键动作必须有人点头。</strong>这正是完整需求文档"十三、验收标准"里 B 组对照实验（本体+规则工作流，不带 AI 自动生成）单独就能评价的部分——先把这层地基做实，比一次性把本体、四个 AI 角色、教学系统、两个场景全部铺开更容易验证，也更容易在做的过程中发现哪里想错了。</p>
+    <p>完整文档不是没用——里面的对象模型、验收清单、对照实验设计，都是等这六步跑顺之后，一项一项往上加的路线图，不需要现在就删掉，只是不用被"六层架构"吓得不敢动手。</p>
+  </section>
+
+  <section>
+    <div class="closing">
+      两份材料都已经保存在 <span class="mono">量子城市平台</span> 文件夹里：完整需求文档（含本页依据的对象模型、验收标准和分阶段实施）见 <a href="复兴岛应急思路-需求分析-重构稿.html">《演安智策》需求分析全文</a>；本页是从中提炼出的最小起点。
+    </div>
+  </section>
+
+  <footer>复兴岛应急孪生 MVP · 最小可行版本说明</footer>
+</div>
