@@ -26,7 +26,7 @@
 - **前端·管理后台** `admin/`：Vue3 + Element Plus，独立于业务系统。
 - **另有 `代码/backend`、`代码/frontend`**：与顶层 `backend/`、`frontend/` 内容高度重合的一份拷贝。`代码/frontend` 是独立 git 仓库（作者 `Codex <codex@openai.com>`，2026-09-05 一次提交，无 remote），比顶层 `frontend/` 多一个 `src/showcase/` 模块——一套不依赖后端、纯前端状态的完整演示工作台（运行总览/业务本体/场景与知识库/应急决策中心/虚拟推演/Agent实验室/复盘报告七个页面，有自动化测试 `tests/showcase.test.mjs`）。**`代码/` 与顶层目录的权威关系尚未核实**，需要用户澄清（是否为同一部署的两份拷贝、谁是当前应该继续开发的版本）。
 - **已知真实限制**：`backend/app/services/rag_service.py` 的向量检索目前返回空结果（embedding未接入）；`llm_service.py` 大模型服务未接入，AI生成类操作会失败。前端各页面均已实现"载入示例XX（演示兜底）"的诚实降级路径，不会假装生成成功。
-- 顶层 `量子城市平台/` 目录本身**没有** Git 仓库；`admin/`、`backend/`、顶层`frontend/` 均非独立 git 仓库；只有 `代码/frontend` 有一个孤立的 git 仓库。
+- 顶层 `量子城市平台/` 目录已于 2026-09-07 初始化 Git 仓库并推送到远程公开仓库 `https://github.com/Tomas1861/Urban-Emergency`（分支 `main`，SSH 已用 `Tomas1861` 账号鉴权）。仓库范围**不含** `代码/` 目录（与顶层重复且归属未定）、课题申报/论证材料（`*.pptx`/`*.docx`，含团队成员信息与经费明细）、`backend/.env` 中的真实 API 密钥——具体排除规则见 `.gitignore`。`admin/`、`backend/`、顶层`frontend/` 现在与顶层目录共用同一个 git 仓库（不再各自独立）；`代码/frontend` 仍是仓库外的一个孤立 git 仓库。
 
 ## 约束与原则
 
