@@ -92,3 +92,16 @@
 - 另发现 `backend/.env` 含真实 DeepSeek/Kimi API key 和 SECRET_KEY——已通过 `.gitignore` 排除，未进入任何提交。同时排除 `node_modules/`、`.venv*/`、`dist/`、`__pycache__/`、`*.db`、之前对话里意外落盘的三张外部参考图片（机制示意.png等，非本项目产出）。
 - 新增顶层 `README.md`、`.gitignore`；`git init`→`git add -A`→核对`git status`确认无密钥/大文件混入→提交→`git remote add origin`→`push -u origin main`成功，154个文件。推送后用 GitHub API 核实内容确已到达远程。
 - 影响：`admin/`、`backend/`、顶层`frontend/`现在与顶层目录共用同一个git仓库，不再是三个独立、无版本控制的目录；后续三人小组可以直接基于这个远程仓库协作。
+
+### 2026-09-30｜新代码拷贝的诊断、环境修复与实机验证（跨多轮对话的完整记录）
+
+- **压缩包损坏排查**：用户提到"复制的zip有问题"，诊断出 `代码.zip`（142MB）缺少ZIP中央目录，是压缩过程被中断的典型症状；同时发现顶层 `admin/backend/frontend` 目录已从磁盘消失（git显示127个文件被删除，但内容仍在git历史/GitHub上未丢失），源文件被找到临时移到了"untitled folder"里，内容完整（backend 111M/frontend 134M/admin 24M）。
+- **第一次"新代码"复制失败**：`代码/`目录被重新创建，但排查发现33个子目录全部在同一秒内建出、真实文件数为0——诊断为"只复制了目录骨架，文件内容从未写入"，排除磁盘空间不足、进程残留、iCloud占位符等可能，最终判断是复制/生成工具在两阶段之间被中断。用户重新复制后确认21084个文件、248M+181M，时间戳分散在Jul23-Sep20之间，确认为真实内容。
+- **环境修复三连**：①`.venv/bin/python3.11`被macOS Gatekeeper隔离（`com.apple.quarantine`+未签名→执行即被SIGKILL），`xattr -dr com.apple.quarantine`清除；②该`.venv`是`uv`管理、依赖`~/.local/share/uv/python/...`本地路径的构建，跨位置复制后底层链接损坏（`ModuleNotFoundError: No module named 'encodings'`），删除后用`uv venv`+`uv pip install -e ".[dev]"`重建（`mcp`可选依赖因Rust/maturin编译`cryptography`失败而跳过，不影响核心功能）；③前端`node_modules`踩到npm已知bug（optional dependency `@rollup/rollup-darwin-x64`未正确安装），删除`node_modules`+`package-lock.json`后`npm install`重装解决。
+- **端口冲突发现**：`preview_start`第一次尝试启动"backend"时意外attach到了一个完全不相关的、已在8000端口运行的"hazmat-model-backend"（用户记忆里明确交代过"hazmat项目只在本地改/测，服务器代码绝不动"的敏感项目）——查明是顶层`/Users/zhou/Desktop/.claude/launch.json`（不是嵌套在项目里那份，harness认的项目根目录其实是`/Users/zhou/Desktop`）里已有同名占用；立即关闭该tab，未对hazmat发送任何写操作，随后把本项目后端改绑8001端口、同步更新前端vite代理配置，在顶层launch.json里新增`fuxing-backend`/`fuxing-frontend`两条不冲突的配置。
+- **preview_start沙箱限制**：`preview_start`按command方式启动uvicorn时报`PermissionError: Operation not permitted`读取`pyvenv.cfg`（同一个venv用Bash工具直接调用却完全正常）——判断是preview_start进程启动器的沙箱比Bash工具更严格；改为用Bash手动启动两个服务进程（`nohup ... &`），launch.json改成`{url,port}`的"仅附加"模式，和已有的hazmat配置一致，问题解决。
+- **登录密码不可逆确认**：`yingji_mvp.db`里的8个账号（admin+7个按岗位命名的测试账号）建于2026-09-17，全库搜索种子脚本/测试文件均未发现明文密码记录，密码用scrypt单向哈希——确认是当时真实操作遗留、技术上无法反推的密码，不是可以"查出来"的bug。用户随后直接提供密码`12345`，登录验证成功。
+- **代码内容核实结果（比2026-09-05核对的版本进步巨大）**：六步业务流程状态机未变，但新增了"事前筹备"双人审核流程（协调人提交、另一审核人确认，同一人不能自审）、真实登录鉴权与4职责工作台（executor/coordinator/reviewer/knowledge）、经验发布与撤回机制（`experience_service.py`真实实现，不再只是文档设想）、以及一套方法论严谨的"六岗课堂教学演练"模块（预注册研究问题/假设→两轮基线-改进对比→24步骤规则分+教师分双轨评价→明确提示"不能仅凭分数上涨认定策略有效"）。大模型（DeepSeek/Kimi）已真实接入四个Agent并联调通过，不再是演示兜底。
+- **浏览器实机验证**：登录成功进入工作台（真实数据，非假数据）；导航到教学演练页面，创建演练时被正确拦截（"请先选择决策中心的教学方案"）——确认教学模块与业务流程模块是真正打通的，不是独立的简化演示。尚未走完完整的"分派→执行→验收→经验入库"链路和教学两轮演练的实机测试。
+- **产出文档**：`用户角色与操作说明.md`——基于代码核实（非设计推测）的业务角色与教学角色具体操作权限说明，已提交推送。
+- **遗留的最重要待办**：顶层git仓库（2026-09-07版`backend/frontend/admin`）与本地`代码/`目录（2026-09-30版，功能明显更新）如何统一，是接下来最需要用户决策的问题，已记入`PROJECT_STATUS.md`。

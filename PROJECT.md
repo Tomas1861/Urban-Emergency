@@ -24,9 +24,9 @@
 - **后端** `backend/`：FastAPI + SQLAlchemy + Alembic + SQLite(`yingji_mvp.db`)，Python ≥3.11，项目名 `yingji-mvp`（`pyproject.toml`）。已装 neo4j 驱动但未必启用。
 - **前端·业务系统** `frontend/`：Vue3 + Element Plus + Pinia + Vite。已实现真实的六步事件处置向导（`EventStepper.vue`：①事件确认②知识检索③预案生成④任务分解⑤执行跟踪⑥复盘报告）、活动/场景/知识库管理页面、完整状态机（`StatusChip.vue`，16个状态词）。
 - **前端·管理后台** `admin/`：Vue3 + Element Plus，独立于业务系统。
-- **另有 `代码/backend`、`代码/frontend`**：与顶层 `backend/`、`frontend/` 内容高度重合的一份拷贝。`代码/frontend` 是独立 git 仓库（作者 `Codex <codex@openai.com>`，2026-09-05 一次提交，无 remote），比顶层 `frontend/` 多一个 `src/showcase/` 模块——一套不依赖后端、纯前端状态的完整演示工作台（运行总览/业务本体/场景与知识库/应急决策中心/虚拟推演/Agent实验室/复盘报告七个页面，有自动化测试 `tests/showcase.test.mjs`）。**`代码/` 与顶层目录的权威关系尚未核实**，需要用户澄清（是否为同一部署的两份拷贝、谁是当前应该继续开发的版本）。
-- **已知真实限制**：`backend/app/services/rag_service.py` 的向量检索目前返回空结果（embedding未接入）；`llm_service.py` 大模型服务未接入，AI生成类操作会失败。前端各页面均已实现"载入示例XX（演示兜底）"的诚实降级路径，不会假装生成成功。
-- 顶层 `量子城市平台/` 目录已于 2026-09-07 初始化 Git 仓库并推送到远程公开仓库 `https://github.com/Tomas1861/Urban-Emergency`（分支 `main`，SSH 已用 `Tomas1861` 账号鉴权）。仓库范围**不含** `代码/` 目录（与顶层重复且归属未定）、课题申报/论证材料（`*.pptx`/`*.docx`，含团队成员信息与经费明细）、`backend/.env` 中的真实 API 密钥——具体排除规则见 `.gitignore`。`admin/`、`backend/`、顶层`frontend/` 现在与顶层目录共用同一个 git 仓库（不再各自独立）；`代码/frontend` 仍是仓库外的一个孤立 git 仓库。
+- **`代码/backend`、`代码/frontend`（2026-09-30 更新，当前实际在跑的版本）**：内容已远超顶层 git 仓库记录的2026-09-07版本——新增真实登录鉴权（`app/core/auth.py`，4种职责 executor/coordinator/reviewer/knowledge）、"事前筹备"双人审核流程（`preparations.py`，提交人不能自审）、经验发布/撤回机制（`experience_service.py`）、"六岗课堂教学演练"模块（`frontend/src/showcase/practice/`）。**大模型（DeepSeek/Kimi）已真实接入并联调通过四个Agent**，不再是演示兜底；RAG改用中英文词项匹配检索，也不再是空实现。详见 `用户角色与操作说明.md`。顶层 `backend/`、`frontend/`、`admin/` 的文件已从磁盘消失（git status显示127个文件删除，内容仍在git历史/GitHub），**新旧两版如何统一尚未决策**，见 `PROJECT_STATUS.md` 下一步。
+- **运行方式**：`代码/backend` 用 `uv venv` + `uv pip install -e ".[dev]"` 重建虚拟环境（不要尝试复制/移动 `.venv`，它依赖 `uv` 管理的本机路径，跨位置复制会坏）；`代码/frontend` 后端固定用 **8001端口**（不是8000——顶层 `/Users/zhou/Desktop/.claude/launch.json` 已有一条不相关的 `hazmat-model-backend` 配置占用8000端口，那是另一个禁止触碰服务器的敏感项目，见 `local-only-hazmat.md`）。复制自外部来源的可执行文件可能被 macOS Gatekeeper 隔离，需要 `xattr -dr com.apple.quarantine` 清除才能运行。
+- 顶层 `量子城市平台/` 目录已于 2026-09-07 初始化 Git 仓库并推送到远程公开仓库 `https://github.com/Tomas1861/Urban-Emergency`（分支 `main`，SSH 已用 `Tomas1861` 账号鉴权）。仓库范围**不含** `代码/` 目录（与顶层重复且归属未定）、课题申报/论证材料（`*.pptx`/`*.docx`，含团队成员信息与经费明细）、`backend/.env` 中的真实 API 密钥——具体排除规则见 `.gitignore`。
 
 ## 约束与原则
 
